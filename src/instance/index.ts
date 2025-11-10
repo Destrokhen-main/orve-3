@@ -10,7 +10,12 @@ export class OrveInstance {
   constructor() {}
 
   use(plugin: OrvePluginType) {
-    new OrvePlugin(this.instance.plugins, plugin);
+    const _plugin = new OrvePlugin(this.instance.plugins, plugin);
+
+    this.instance.plugins = {
+      ...this.instance.plugins,
+      ..._plugin.pluginContext,
+    }
     return this;
   }
 
