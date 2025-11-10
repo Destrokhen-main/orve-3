@@ -23,7 +23,9 @@ export class OrveInstance {
     return this.instance.plugins;
   }
 
-  rootComponent(app: any) {}
+  rootComponent(app: any) {
+    
+  }
   mountRoot(el: HTMLElement | string) {}
 }
 
