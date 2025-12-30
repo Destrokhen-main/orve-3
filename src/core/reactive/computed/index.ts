@@ -25,6 +25,22 @@ export class Computed<T> {
   proccessEffect() {
     let isFisrtCalc = true;
 
+    if (this.options?.deps) {
+      const deps = this.options.deps;
+
+      this._value = this.callBack();
+
+      this._effect = () => {
+        this._value = this.callBack();
+        core.trigger(this, '$_val');
+      }
+
+      deps.forEach((dep) => {
+        core.track(dep, '$_val', this._effect!);
+      })
+      return;
+    }
+
     if (this._effect) {
       core.deleteByEffect(this._effect);
     }

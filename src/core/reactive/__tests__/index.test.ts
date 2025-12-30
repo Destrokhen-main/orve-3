@@ -135,5 +135,23 @@ describe("reactive", () => {
       expect(fn).toHaveBeenCalledTimes(2)
       expect(dFn).toHaveBeenCalledTimes(3);
     })
+
+    it('should correct update computed (custom list dep)', async () => {
+      const a = state(1);
+      const b = state(2);
+
+      const fn = jest.fn(() => {
+        return a.get() + b.get()
+      })
+
+      const c = computed(fn, { deps: [a] });
+
+      expect(c.get()).toBe(3);
+      await nextTick();
+
+      b.set(b.get() + 1);
+      await nextTick();
+      expect(fn).toHaveBeenCalledTimes(1);
+    })
   })
 })
