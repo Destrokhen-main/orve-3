@@ -1,11 +1,40 @@
 /**
  * @jest-environment jsdom
  */
-import type { JSX } from "react";
+import { componentInstance } from "./component";
+import { Children, JSX } from "react";
 
-describe('Component', () => {
-  it('1', () => {
-    expect(1).toBe(1);
+function render(type: any, props: any, key: string | null): JSX.Element {
+  return {
+    type,
+    props,
+    key,
+  };
+}
+
+describe("Component", () => {
+  it("1", async () => {
+    const testComponent = async () => {
+      return render(
+        "div",
+        {
+          children: [
+            render(
+              () => {
+                return "string";
+              },
+              {},
+              null,
+            ),
+            "qwe",
+          ],
+        },
+        null,
+      );
+    };
+
+    const component = componentInstance(testComponent, { levelRender: 1 });
+    await component.setup({});
+    console.log(component.getChildren());
   });
-  // TODO тесты надо накидать
-})
+});
