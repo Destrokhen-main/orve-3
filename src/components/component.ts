@@ -9,8 +9,8 @@ import type {
   ContextComponent,
   RenderComponent,
 } from "./type";
-import { textNodeClass } from "./textNodeClass";
-import { nodeClass } from "./nodeClass";
+import { TextNodeClass, textNodeClass } from "./textNodeClass";
+import { NodeClass, nodeClass } from "./nodeClass";
 
 export class ComponentClass<T extends Props> {
   /*
@@ -38,7 +38,7 @@ export class ComponentClass<T extends Props> {
 
   private context: Record<string, any> | null = null;
   private render: RenderComponent | (() => RenderComponent) | null = null;
-  private children: any[] = [];
+  private children: (ComponentClass<any> | TextNodeClass | NodeClass)[] = [];
 
   private contextComponent: ContextComponent = {
     canSetup: null,
@@ -67,7 +67,16 @@ export class ComponentClass<T extends Props> {
       }
       this.contextComponent.canSetup = true;
 
-      if (!this.render || typeof this.render === "string") {
+      if (!this.render) {
+        return;
+      }
+
+      if (typeof this.render === "string") {
+        const node = textNodeClass(
+          this.render,
+          this.contextComponent.levelRender + 1,
+        );
+        this.children.push(node);
         return;
       }
 
@@ -82,7 +91,7 @@ export class ComponentClass<T extends Props> {
           this.contextComponent.key = this.render.key;
         }
 
-        const reversedArray = childrenArray.reverse();
+        const reversedArray = [...childrenArray].reverse();
 
         while (reversedArray.length > 0) {
           const item = reversedArray.pop()!;
@@ -114,10 +123,23 @@ export class ComponentClass<T extends Props> {
     }
   }
 
-  mounted(node: Element) {}
+  mounted(node: Element): Element {
+    if (!this.children || this.contextComponent.mounted || !this.render) {
+      return node;
+    }
+    if (typeof this.render === "string") {
+      return (this.children[0] as TextNodeClass).mounted(node);
+    }
 
-  getChildren() {
-    return this.children;
+    if (typeof this.render !== "function") {
+      let nodeComponent = document.createElement(this.render.type) as Element;
+
+      for (const item of this.children) {
+        nodeComponent = item.mounted(nodeComponent);
+      }
+      node.appendChild(nodeComponent);
+    }
+    return node;
   }
 }
 

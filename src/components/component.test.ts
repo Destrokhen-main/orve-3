@@ -13,21 +13,20 @@ function render(type: any, props: any, key: string | null): JSX.Element {
 }
 
 describe("Component", () => {
-  it("1", async () => {
+  const root = document.createElement("div");
+  root.setAttribute("id", "root");
+  document.body.appendChild(root);
+
+  beforeEach(() => {
+    root.innerHTML = "";
+  });
+
+  it("render <div>test</div>", async () => {
     const testComponent = async () => {
       return render(
         "div",
         {
-          children: [
-            render(
-              () => {
-                return "string";
-              },
-              {},
-              null,
-            ),
-            "qwe",
-          ],
+          children: "test",
         },
         null,
       );
@@ -35,6 +34,7 @@ describe("Component", () => {
 
     const component = componentInstance(testComponent, { levelRender: 1 });
     await component.setup({});
-    console.log(component.getChildren());
+    component.mounted(root);
+    expect(document.body.children).toMatchSnapshot();
   });
 });

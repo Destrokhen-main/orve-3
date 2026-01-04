@@ -1,5 +1,5 @@
 import { JSX } from "react";
-import { componentInstance } from "./component";
+import { ComponentClass, componentInstance } from "./component";
 import { textNodeClass, TextNodeClass } from "./textNodeClass";
 import { ContextComponent } from "./type";
 
@@ -10,7 +10,7 @@ export class NodeClass {
     Это если компонент не возвращает функцию, а возвращает сразу JSX которые не будет перерендериваться
   */
   private element: Element | null = null;
-  private children: any[] = [];
+  private children: (ComponentClass<any> | TextNodeClass | NodeClass)[] = [];
   private contextComponent: ContextComponent = {
     canSetup: null,
     mounted: false,
@@ -30,7 +30,7 @@ export class NodeClass {
       ? this.node.props.children
       : [this.node.props.children];
 
-    const reverseChildren = childrenArray.reverse();
+    const reverseChildren = [...childrenArray].reverse();
     while (reverseChildren.length > 0) {
       const item = reverseChildren.pop()!;
 
@@ -52,7 +52,16 @@ export class NodeClass {
     }
   }
 
-  mounted(node: Element) {}
+  mounted(node: Element) {
+    let nodeClass = document.createElement(this.node.type);
+
+    for (const item of this.children) {
+      nodeClass = item.mounted(nodeClass);
+    }
+
+    node.appendChild(nodeClass);
+    return node;
+  }
 }
 
 export function nodeClass(node: JSX.Element, levelRender: number) {

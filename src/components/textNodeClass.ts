@@ -16,8 +16,9 @@ export class TextNodeClass {
 
   mounted(node: Element) {
     this.element = document.createTextNode(this.text);
-    node.appendChild(node);
+    node.appendChild(this.element);
     this.contextComponent.mounted = true;
+    return node;
   }
 }
 
