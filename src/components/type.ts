@@ -1,6 +1,6 @@
 import { JSX } from "react";
 
-export type RenderComponent = JSX.Element | string | null;
+export type RenderComponent = JSX.Element | string | number | null;
 export type Props = Record<string, any> | undefined;
 export type Component<T extends Props = undefined> = (
   props: T,

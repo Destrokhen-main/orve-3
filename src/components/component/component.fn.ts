@@ -1,9 +1,8 @@
-import { Computed } from "../../core/reactive/computed";
 import { core, setEffectOnces } from "../../core/reactive/core";
-import { State } from "../../core/reactive/state";
 import { TextNode } from "../textNode";
 import { RenderComponent } from "../type";
 import { PRIMITIVE } from "./constants";
+import { diffRender } from "./utils/diffRender";
 
 export class ComponentFn {
   private elements: any[] = [];
@@ -51,7 +50,7 @@ export class ComponentFn {
       this.unMountedElements();
     }
 
-    const diff = this.diffRender(render);
+    const diff = diffRender(this.lastRender, render);
     if (diff === "all") {
       this.unMountedElements();
 
@@ -67,20 +66,5 @@ export class ComponentFn {
       }
       this.lastRender = render;
     }
-  }
-
-  private diffRender(render: RenderComponent): "all" | undefined {
-    if (!this.lastRender) {
-      return "all";
-    }
-
-    if (
-      (PRIMITIVE.includes(typeof this.lastRender) ||
-        this.lastRender === null) &&
-      render !== this.lastRender
-    ) {
-      return "all";
-    }
-    // проверить что поменялось относительно прошлого рендера
   }
 }
