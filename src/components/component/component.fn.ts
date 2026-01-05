@@ -31,20 +31,29 @@ export class ComponentFn {
     this.effect = null;
   }
 
-  reMounted(node: Element) {
+  private unMountedElements() {
+    if (this.elements.length > 0) {
+      // снесу вообще всё;
+      this.elements.forEach((el) => {
+        if (el instanceof TextNode) {
+          el.unMounted();
+        }
+        // el.remove()
+      });
+      this.elements = [];
+    }
+  }
+
+  private reMounted(node: Element) {
     const render = this.render();
+
+    if (this.lastRender !== null && render === null) {
+      this.unMountedElements();
+    }
+
     const diff = this.diffRender(render);
     if (diff === "all") {
-      if (this.elements.length > 0) {
-        // снесу вообще всё;
-        this.elements.forEach((el) => {
-          if (el instanceof TextNode) {
-            el.unMounted();
-          }
-          // el.remove()
-        });
-        this.elements = [];
-      }
+      this.unMountedElements();
 
       if (render === null) {
         this.lastRender = render;
@@ -60,22 +69,18 @@ export class ComponentFn {
     }
   }
 
-  private diffRender(render: RenderComponent) {
+  private diffRender(render: RenderComponent): "all" | undefined {
     if (!this.lastRender) {
       return "all";
     }
 
     if (
-      (typeof this.lastRender === "string" || this.lastRender === null) &&
+      (PRIMITIVE.includes(typeof this.lastRender) ||
+        this.lastRender === null) &&
       render !== this.lastRender
     ) {
       return "all";
     }
-
-    if (render instanceof State || render instanceof Computed) {
-      // Object.is(this.lastRender, render);
-    }
-
     // проверить что поменялось относительно прошлого рендера
   }
 }

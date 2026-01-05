@@ -77,7 +77,7 @@ describe("Component functions render", () => {
   });
 });
 
-describe.skip("Component single render", () => {
+describe("Component single render", () => {
   const root = document.createElement("div");
   document.body.appendChild(root);
 
