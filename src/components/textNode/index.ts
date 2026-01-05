@@ -6,7 +6,7 @@ import { stringValue } from "../helperNode/stringValue";
 
 export class TextNode {
   private element: Text | null = null;
-  constructor(private text: string | State<any> | Computed<any>) {}
+  constructor(private text: string | number | State<any> | Computed<any>) {}
 
   mounted(node: Element) {
     this.element = createText("");
@@ -16,7 +16,7 @@ export class TextNode {
         setText(this.element, stringValue(this.text));
       });
     } else {
-      setText(this.element, this.text);
+      setText(this.element, stringValue(this.text));
     }
 
     insert(this.element, node);
