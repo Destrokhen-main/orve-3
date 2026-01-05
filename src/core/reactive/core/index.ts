@@ -1,7 +1,7 @@
 import { Effect } from "./effect";
 import { Reactive } from "./types";
 
-export let effect : (() => void) | null = null;
+export let effect: (() => void) | null = null;
 export function setEffectOnces(fn: () => void) {
   effect = fn;
   fn();
@@ -11,7 +11,10 @@ export function setEffectOnces(fn: () => void) {
 class Core {
   private quee: Set<() => void> = new Set();
   private stateMap = new WeakMap<Reactive, Map<string, Set<Effect>>>();
-  private subscribersEffect = new WeakMap<() => void, Map<string, Set<Reactive>>>();
+  private subscribersEffect = new WeakMap<
+    () => void,
+    Map<string, Set<Reactive>>
+  >();
   private pending = false;
 
   add(fn: () => void) {
@@ -27,9 +30,9 @@ class Core {
       this.pending = true;
       queueMicrotask(() => {
         this.pending = false;
-        this.quee.forEach(f => f());
+        this.quee.forEach((f) => f());
         this.quee = new Set();
-      })
+      });
     }
   }
 
@@ -42,13 +45,14 @@ class Core {
     if (!map) {
       return;
     }
-    
+
     if (map.has(key)) {
       map.delete(key);
     }
   }
 
   deleteByEffect(fn: () => void) {
+    this.cancelTask(fn);
     const reactives = this.subscribersEffect.get(fn);
 
     if (!reactives) {
@@ -58,7 +62,7 @@ class Core {
     for (const [key, value] of reactives.entries()) {
       value.forEach((r) => {
         this.deleteState(r, key, fn);
-      })
+      });
     }
     this.subscribersEffect.delete(fn);
   }
@@ -78,9 +82,8 @@ class Core {
       map.set(key, keySet);
     }
 
-    const effect = new Effect(fn)
+    const effect = new Effect(fn);
     keySet.add(effect);
-
 
     let setEffect = this.subscribersEffect.get(effect.fn);
     if (!setEffect) {
@@ -93,7 +96,7 @@ class Core {
       set = new Set();
       setEffect.set(key, set);
     }
-     
+
     set.add(target);
 
     return effect;
@@ -110,12 +113,12 @@ class Core {
       return;
     }
 
-    set.forEach(f => {
+    set.forEach((f) => {
       if (f.isActive) {
         this.add(f.fn);
       }
-    })
-  } 
+    });
+  }
 }
 
 export async function nextTick(fn?: () => void) {

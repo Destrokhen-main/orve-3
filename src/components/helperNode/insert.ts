@@ -1,7 +1,7 @@
-export function insert(to: Element, child: Element, anchor?: Element) {
-  if (anchor) {
-    to.insertBefore(anchor, child);
-  } else {
-    to.appendChild(child);
-  }
+export function insert(child: any, parent: any, anchor?: any) {
+  parent.insertBefore(child, anchor);
+}
+
+export function insertAfter(child: any, parent: any) {
+  parent.after(child);
 }
