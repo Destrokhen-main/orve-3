@@ -107,12 +107,6 @@ export class Node {
         !Object.is(oldValue, newValue)
       ) {
         patchProps(this.element, prop, oldValue, newValue);
-      } else if (
-        typeof oldValue === "function" &&
-        typeof newValue === "function" &&
-        oldValue !== newValue
-      ) {
-        patchProps(this.element, prop, oldValue, newValue);
       } else if (oldValue !== newValue) {
         patchProps(this.element, prop, oldValue, newValue);
       }
