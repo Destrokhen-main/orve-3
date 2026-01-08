@@ -3,11 +3,14 @@ import { TextNode } from "../textNode";
 import { RenderComponent } from "../type";
 import { PRIMITIVE } from "./constants";
 import { diffRender } from "./utils/diffRender";
+import { isJsx } from "./utils/isJsx";
+import { Node } from "../node";
+import { JSX } from "react";
 
 export class ComponentFn {
-  private elements: any[] = [];
+  private elements: (TextNode | Node)[] = [];
   private effect: (() => void) | null = null;
-  private lastRender: any | undefined = undefined;
+  private lastRender: RenderComponent | undefined = undefined;
 
   constructor(private render: () => RenderComponent) {}
 
@@ -34,10 +37,9 @@ export class ComponentFn {
     if (this.elements.length > 0) {
       // снесу вообще всё;
       this.elements.forEach((el) => {
-        if (el instanceof TextNode) {
+        if (el instanceof TextNode || el instanceof Node) {
           el.unMounted();
         }
-        // el.remove()
       });
       this.elements = [];
     }
@@ -45,26 +47,51 @@ export class ComponentFn {
 
   private reMounted(node: Element) {
     const render = this.render();
-
     if (this.lastRender !== null && render === null) {
       this.unMountedElements();
+      this.lastRender = null;
+      return;
     }
 
-    const diff = diffRender(this.lastRender, render);
-    if (diff === "all") {
-      this.unMountedElements();
-
-      if (render === null) {
-        this.lastRender = render;
-        return;
-      }
-
+    if (this.lastRender === undefined && render !== null) {
       if (PRIMITIVE.includes(typeof render)) {
         const textNode = new TextNode(render as string);
         textNode.mounted(node);
         this.elements.push(textNode);
       }
-      this.lastRender = render;
+
+      if (isJsx(render)) {
+        const _node = new Node(render, { isFnNode: true });
+        _node.setup();
+        _node.mounted(node);
+        this.elements.push(_node);
+      }
     }
+
+    if (this.lastRender !== undefined) {
+      if (
+        PRIMITIVE.includes(typeof render) &&
+        PRIMITIVE.includes(typeof this.lastRender)
+      ) {
+        (this.elements[0] as TextNode).reMounted(render as string);
+      } else if (
+        PRIMITIVE.includes(typeof render) &&
+        this.lastRender === null
+      ) {
+        const textNode = new TextNode(render as string);
+        textNode.mounted(node);
+        this.elements.push(textNode);
+      } else if (PRIMITIVE.includes(typeof render) && isJsx(this.lastRender)) {
+        this.unMountedElements();
+        const _node = new Node(render as JSX.Element, { isFnNode: true });
+        _node.setup();
+        _node.mounted(node);
+        this.elements.push(_node);
+      } else if (isJsx(this.lastRender) && isJsx(render)) {
+        (this.elements[0] as Node).reMounted(render);
+      }
+    }
+
+    this.lastRender = render;
   }
 }

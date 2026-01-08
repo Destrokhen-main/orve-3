@@ -1,0 +1,155 @@
+import { JSX } from "react";
+import { TextNode } from "../textNode";
+import { FRAGMENT, PRIMITIVE } from "../component/constants";
+import { isJsx } from "../component/utils/isJsx";
+import { insert, patchProps, remove, replaceElement } from "../helperNode";
+
+type OptionsNode = {
+  isFnNode: boolean;
+  isTypeFn?: boolean;
+};
+
+export class Node {
+  private element: Element | null = null;
+  private type: JSX.Element["type"];
+  private childrens: (Node | TextNode)[] = [];
+  private props: Record<string, any> = {};
+
+  constructor(
+    private jsx: JSX.Element,
+    private options: OptionsNode,
+  ) {}
+
+  setup(jsx?: JSX.Element) {
+    const workJsx = jsx ?? this.jsx;
+
+    this.type = workJsx.type;
+    this.options.isTypeFn = typeof this.type === "function";
+
+    const childrens: any[] = Array.isArray(workJsx.props.children)
+      ? workJsx.props.children
+      : [workJsx.props.children];
+
+    const { children, ...pr } = workJsx.props;
+    this.props = pr;
+
+    for (const i of childrens) {
+      if (PRIMITIVE.includes(typeof i)) {
+        const textNode = new TextNode(i);
+        this.childrens.push(textNode);
+      } else if (isJsx(i)) {
+        const node = new Node(i, { isFnNode: this.options.isFnNode });
+        node.setup();
+        this.childrens.push(node);
+      }
+    }
+  }
+
+  mounted(node: Element, needReplace: boolean = false) {
+    let currNode = null;
+
+    // если type функция, надо подумать
+    // похоже надо вызывать компонент новый
+
+    if (this.type === FRAGMENT) {
+      currNode = node;
+    }
+
+    if (typeof this.type === "string") {
+      currNode = document.createElement(this.type);
+    }
+
+    const keysProps = Object.keys(this.props);
+
+    for (const key of keysProps) {
+      const value = this.props[key];
+      patchProps(currNode, key, null, value);
+    }
+
+    for (const i of this.childrens) {
+      i.mounted(currNode!);
+    }
+
+    if (this.type !== FRAGMENT) {
+      if (needReplace) {
+        replaceElement(node, currNode);
+      } else {
+        insert(currNode!, node);
+      }
+    }
+    this.element = currNode;
+  }
+
+  getElement() {
+    return this.element;
+  }
+
+  reMounted(jsx: JSX.Element) {
+    const { children, ...props } = jsx.props;
+
+    const childrens = Array.isArray(children) ? children : [children];
+
+    // смотрим на key
+
+    // проверяем type
+
+    // проверяем props
+
+    // проверяем children
+    // console.log(children, this.childrens);
+    for (let i = 0; i !== childrens.length; i++) {
+      const children = childrens[i];
+      const childrenNode = this.childrens[i];
+
+      if (!childrenNode) {
+        if (PRIMITIVE.includes(typeof children)) {
+          const textNode = new TextNode(children);
+          textNode.mounted(this.element!);
+          this.childrens.push(textNode);
+        } else if (isJsx(children)) {
+          const node = new Node(children, { isFnNode: this.options.isFnNode });
+          node.setup();
+          node.mounted(this.element!);
+        }
+        continue;
+      }
+
+      if (
+        (isJsx(children) && childrenNode instanceof Node) ||
+        (PRIMITIVE.includes(typeof children) &&
+          childrenNode instanceof TextNode)
+      ) {
+        childrenNode.reMounted(children);
+      } else if (
+        PRIMITIVE.includes(typeof children) &&
+        childrenNode instanceof Node
+      ) {
+        const textNode = new TextNode(children);
+        textNode.mounted(childrenNode.getElement()!, true);
+        this.childrens[i] = textNode;
+      } else if (isJsx(children) && childrenNode instanceof TextNode) {
+        const node = new Node(children, { isFnNode: this.options.isFnNode });
+        node.setup();
+        // тут будет все равно replace
+        node.mounted(childrenNode.getElement() as any, true);
+        this.childrens[i] = node;
+      }
+    }
+
+    if (childrens.length < this.childrens.length) {
+      for (let i = children.length; i !== this.childrens.length; i++) {
+        const item = this.childrens[i];
+        item.unMounted();
+      }
+      this.childrens = this.childrens.slice(0, childrens.length);
+    }
+  }
+
+  unMounted() {
+    if (!this.element) {
+      return;
+    }
+    remove(this.element, true);
+    this.element = null;
+  }
+}

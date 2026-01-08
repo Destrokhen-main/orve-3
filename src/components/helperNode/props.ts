@@ -1,1 +1,35 @@
-export function propsToElement() {}
+import { patchClass } from "./pathProps/class";
+import { patchImage } from "./pathProps/image";
+import { patchStyle } from "./pathProps/style";
+
+export function patchProps(
+  el: any,
+  key: string,
+  prevValue: any,
+  nextValue: any,
+  // namespace?: "svg" | "mathml",
+  // prevChildren?: any[],
+  // parentComponent?: any | null,
+  // parentSuspense?: any | null,
+  // unmountChildren?: any,
+) {
+  if (key === "style") {
+    patchStyle(el, nextValue);
+  } else if (key === "class") {
+    patchClass(el, nextValue);
+  } else if (key === "src") {
+    patchImage(el, nextValue);
+  } else if (nextValue === null) {
+    el.removeAttribute(key);
+  } else if (key === "value") {
+    el.value = nextValue;
+  } else if (typeof nextValue === "boolean") {
+    if (nextValue) {
+      el.setAttribute(key, "");
+    } else {
+      el.removeAttribute(key);
+    }
+  } else {
+    el.setAttribute(key, nextValue);
+  }
+}
