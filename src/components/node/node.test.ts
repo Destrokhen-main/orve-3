@@ -298,6 +298,28 @@ describe("Node", () => {
       });
       expect(document.body.innerHTML).toBe("<div><p></p></div>");
     });
+
+    it("bool props", () => {
+      const el: JSX.Element = {
+        type: "p",
+        props: {
+          id: true,
+        },
+        key: null,
+      };
+
+      const node = new Node(el, { isFnNode: true });
+      node.setup();
+      node.mounted(root);
+      expect(document.body.innerHTML).toBe('<div><p id=""></p></div>');
+
+      node.reMounted({
+        type: "p",
+        props: {},
+        key: null,
+      });
+      expect(document.body.innerHTML).toBe("<div><p></p></div>");
+    });
   });
 
   describe("key", () => {});
