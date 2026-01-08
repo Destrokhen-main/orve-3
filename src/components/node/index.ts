@@ -94,6 +94,39 @@ export class Node {
     // проверяем type
 
     // проверяем props
+    const newProps = Object.keys(props);
+    for (const prop of newProps) {
+      const oldValue = this.props[prop] ?? null;
+      const newValue = props[prop];
+
+      if (!oldValue) {
+        patchProps(this.element, prop, null, newValue);
+      } else if (
+        typeof oldValue === "object" &&
+        typeof newValue === "object" &&
+        !Object.is(oldValue, newValue)
+      ) {
+        patchProps(this.element, prop, oldValue, newValue);
+      } else if (
+        typeof oldValue === "function" &&
+        typeof newValue === "function" &&
+        oldValue !== newValue
+      ) {
+        patchProps(this.element, prop, oldValue, newValue);
+      } else if (oldValue !== newValue) {
+        patchProps(this.element, prop, oldValue, newValue);
+      }
+    }
+
+    // удалим старые пропы
+    const oldProps = Object.keys(this.props);
+    for (const prop of oldProps) {
+      const oldValue = this.props[prop] ?? null;
+      if (!(prop in props)) {
+        patchProps(this.element, prop, oldValue, null);
+      }
+    }
+    this.props = props;
 
     // проверяем children
     // console.log(children, this.childrens);

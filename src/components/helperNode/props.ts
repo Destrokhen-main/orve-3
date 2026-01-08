@@ -1,5 +1,6 @@
 import { patchClass } from "./pathProps/class";
 import { patchImage } from "./pathProps/image";
+import { patchListener } from "./pathProps/listener";
 import { patchStyle } from "./pathProps/style";
 
 export function patchProps(
@@ -29,6 +30,8 @@ export function patchProps(
     } else {
       el.removeAttribute(key);
     }
+  } else if (typeof nextValue === "function" && key.startsWith("on")) {
+    patchListener(el, key, prevValue, nextValue);
   } else {
     el.setAttribute(key, nextValue);
   }
