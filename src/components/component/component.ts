@@ -56,13 +56,13 @@ export class ComponentClass<T extends Props> {
     this.contextComponent.levelRender = options.levelRender;
   }
 
-  async setup(props: T) {
+  setup(props: T) {
     // подготовить надо контекст
     this.context = {};
     setContext(this.context);
 
     try {
-      const render = await this.fn(props);
+      const render = this.fn(props);
       if (render === null) {
         return;
       }

@@ -3,6 +3,7 @@ import { TextNode } from "../textNode";
 import { FRAGMENT, PRIMITIVE } from "../component/constants";
 import { isJsx } from "../component/utils/isJsx";
 import { insert, patchProps, remove, replaceElement } from "../helperNode";
+import { ComponentClass, componentInstance } from "../component/component";
 
 type OptionsNode = {
   isFnNode: boolean;
@@ -12,7 +13,7 @@ type OptionsNode = {
 export class Node {
   private element: Element | null = null;
   private type: JSX.Element["type"];
-  private childrens: (Node | TextNode)[] = [];
+  private childrens: (Node | TextNode | ComponentClass<any>)[] = [];
   private props: Record<string, any> = {};
 
   constructor(
@@ -38,14 +39,28 @@ export class Node {
         const textNode = new TextNode(i);
         this.childrens.push(textNode);
       } else if (isJsx(i)) {
-        const node = new Node(i, { isFnNode: this.options.isFnNode });
-        node.setup();
-        this.childrens.push(node);
+        if (typeof i.type === "function") {
+          const node = componentInstance(i.type, {
+            isRerenderComponent: true,
+            levelRender: 1,
+          });
+          node.setup(i.props);
+          this.childrens.push(node);
+        } else {
+          const node = new Node(i, { isFnNode: this.options.isFnNode });
+          node.setup();
+          this.childrens.push(node);
+        }
       }
     }
   }
 
   mounted(node: Element, needReplace: boolean = false) {
+    if (this.options.isTypeFn) {
+      (this.childrens[0] as ComponentClass<any>).mounted(node);
+      return;
+    }
+
     let currNode = null;
 
     // если type функция, надо подумать
@@ -85,6 +100,8 @@ export class Node {
   }
 
   reMounted(jsx: JSX.Element) {
+    // TODO тут пока хз может надо переделать
+
     const { children, ...props } = jsx.props;
 
     const childrens = Array.isArray(children) ? children : [children];

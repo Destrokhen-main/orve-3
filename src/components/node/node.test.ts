@@ -1,5 +1,7 @@
 import { JSX } from "react";
 import { Node } from "./index";
+import { state } from "../../core/reactive/state";
+import { nextTick } from "../../core/reactive/core";
 
 describe("Node", () => {
   const root = document.createElement("div");
@@ -215,6 +217,74 @@ describe("Node", () => {
 
       expect(document.body.innerHTML).toBe(
         "<div><div>text-2<p>text-3</p></div></div>",
+      );
+    });
+
+    it("component in children", () => {
+      const el: JSX.Element = {
+        type: "div",
+        props: {
+          id: "1",
+          children: {
+            type: ({ id }: any) => {
+              return () => ({
+                type: "p",
+                props: { class: id, children: "text" },
+                key: null,
+              });
+            },
+            props: {
+              id: "cl",
+            },
+          },
+        },
+        key: null,
+      };
+      const node = new Node(el, { isFnNode: true });
+      node.setup();
+      node.mounted(root);
+
+      expect(document.body.innerHTML).toBe(
+        '<div><div id="1"><p class="cl">text</p></div></div>',
+      );
+    });
+
+    it("const state render component in children", async () => {
+      const a = state(true);
+      const el: JSX.Element = {
+        type: "div",
+        props: {
+          children: {
+            type: ({ id }: any) => {
+              return () => ({
+                type: "p",
+                props: {
+                  ...(a.get() ? { id } : { class: id }),
+                  children: a.get() ? "true state" : "false state",
+                },
+                key: null,
+              });
+            },
+            props: {
+              id: "foo",
+            },
+            key: null,
+          },
+        },
+        key: null,
+      };
+
+      const node = new Node(el, { isFnNode: true });
+      node.setup();
+      node.mounted(root);
+
+      expect(document.body.innerHTML).toBe(
+        '<div><div><p id="foo">true state</p></div></div>',
+      );
+      a.set(false);
+      await nextTick();
+      expect(document.body.innerHTML).toBe(
+        '<div><div><p class="foo">false state</p></div></div>',
       );
     });
   });

@@ -4,10 +4,7 @@ export type RenderComponent = JSX.Element | string | number | null;
 export type Props = Record<string, any> | undefined;
 export type Component<T extends Props = undefined> = (
   props: T,
-) =>
-  | Promise<RenderComponent | (() => RenderComponent)>
-  | RenderComponent
-  | (() => RenderComponent);
+) => RenderComponent | (() => RenderComponent);
 export type ComponentInstanceOptions = {
   levelRender: number;
   isChild?: boolean;
