@@ -1,5 +1,5 @@
 import { JSX } from "react";
-import { getType } from "../../../core/utlils";
+import { getType } from "../../core/utlils";
 
 export function isJsx(item: unknown): item is JSX.Element {
   if (getType(item) !== "object") {

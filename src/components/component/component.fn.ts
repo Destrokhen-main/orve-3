@@ -2,8 +2,7 @@ import { core, setEffectOnces } from "../../core/reactive/core";
 import { TextNode } from "../textNode";
 import { RenderComponent } from "../type";
 import { PRIMITIVE } from "./constants";
-import { diffRender } from "./utils/diffRender";
-import { isJsx } from "./utils/isJsx";
+import { isJsx } from "../utils";
 import { Node } from "../node";
 import { JSX } from "react";
 

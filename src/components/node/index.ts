@@ -1,7 +1,7 @@
 import { JSX } from "react";
 import { TextNode } from "../textNode";
 import { FRAGMENT, PRIMITIVE } from "../component/constants";
-import { isJsx } from "../component/utils/isJsx";
+import { isJsx } from "../utils";
 import { insert, patchProps, remove, replaceElement } from "../helperNode";
 import { ComponentClass, componentInstance } from "../component/component";
 
