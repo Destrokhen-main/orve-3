@@ -1,4 +1,4 @@
-export function patchImage(el: any, nextValue: any) {
+export function patchImage(el: any, nextValue: string | null) {
   if (nextValue === null) {
     el.removeAttribute("src");
   } else {

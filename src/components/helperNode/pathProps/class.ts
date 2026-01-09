@@ -1,4 +1,4 @@
-export function patchClass(el: any, nextValue: any) {
+export function patchClass(el: Element, nextValue: string | null) {
   if (nextValue === null) {
     el.removeAttribute("class");
   } else {
@@ -6,7 +6,7 @@ export function patchClass(el: any, nextValue: any) {
   }
 }
 
-export function patchSingleClass(el: any, key: string, nextValue: any) {
+export function patchSingleClass(el: Element, key: string, nextValue: string) {
   if (typeof key === "string" && key.length === 0) {
     return;
   }

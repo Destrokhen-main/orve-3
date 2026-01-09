@@ -1,3 +1,3 @@
-export function replaceElement(node: any, el: any) {
+export function replaceElement(node: Element, el: Element) {
   node.replaceWith(el);
 }

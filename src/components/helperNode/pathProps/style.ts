@@ -1,6 +1,9 @@
 import { objectToCss } from "./objectToCss";
 
-export function patchStyle(el: any, nextValue: any) {
+export function patchStyle(
+  el: Element,
+  nextValue: string | Record<string, string>,
+) {
   if (typeof nextValue === "string") {
     el.setAttribute("style", nextValue);
   }
@@ -10,7 +13,11 @@ export function patchStyle(el: any, nextValue: any) {
   }
 }
 
-export function patchSingleStyle(el: any, key: string, nextValue: any) {
+export function patchSingleStyle(
+  el: any,
+  key: string,
+  nextValue: string | null,
+) {
   if (nextValue === null) {
     el.style.removeProperty(key);
   }
