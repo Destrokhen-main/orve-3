@@ -2,12 +2,18 @@ import { JSX } from "react";
 import { TextNode } from "../textNode";
 import { FRAGMENT, PRIMITIVE } from "../component/constants";
 import { isJsx } from "../utils";
-import { insert, patchProps, remove, replaceElement } from "../helperNode";
+import {
+  insert,
+  patchProps,
+  remove,
+  replaceElement,
+} from "../../utils/helperNode";
 import { ComponentClass, componentInstance } from "../component/component";
 
 type OptionsNode = {
   isFnNode: boolean;
   isTypeFn?: boolean;
+  parent?: ComponentClass<any> | Node;
 };
 
 export class Node {
@@ -15,11 +21,14 @@ export class Node {
   private type: JSX.Element["type"];
   private childrens: (Node | TextNode | ComponentClass<any>)[] = [];
   private props: Record<string, any> = {};
+  private parent: ComponentClass<any> | Node | null = null;
 
   constructor(
     private jsx: JSX.Element,
     private options: OptionsNode,
-  ) {}
+  ) {
+    this.parent = options.parent ?? null;
+  }
 
   setup(jsx?: JSX.Element) {
     const workJsx = jsx ?? this.jsx;
@@ -87,7 +96,7 @@ export class Node {
 
     if (this.type !== FRAGMENT) {
       if (needReplace) {
-        replaceElement(node, currNode);
+        replaceElement(node, currNode!);
       } else {
         insert(currNode!, node);
       }
@@ -109,6 +118,25 @@ export class Node {
     // смотрим на key
 
     // проверяем type
+    if (jsx.type !== this.type) {
+      // размонтирую все элементы
+      // const nodeBefore = this.element;
+      // const node = nodeBefore!.nextElementSibling;
+      this.unMounted();
+      this.options.isTypeFn = typeof jsx.type === "function";
+      if (typeof jsx.type === "function") {
+        const component = componentInstance(jsx.type, {
+          isRerenderComponent: true,
+          levelRender: 1,
+        });
+        component.setup(jsx.props);
+        // надо думать как монтировать в таком случае
+        // component.mounted(node!);
+      } else if (jsx.type === FRAGMENT) {
+        console.log(jsx);
+        //
+      }
+    }
 
     // проверяем props
     const allProps = new Set([
@@ -189,6 +217,10 @@ export class Node {
     if (!this.element) {
       return;
     }
+
+    this.childrens.forEach((children) => {
+      children.unMounted();
+    });
     remove(this.element, true);
     this.element = null;
   }

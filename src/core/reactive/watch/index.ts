@@ -23,28 +23,31 @@ class Watch {
   private connect() {
     const states: unknown[] = [];
     this.deps.forEach((dep) => {
-      states.push(dep.get());
+      states.push(dep.value);
     });
     this.lastValue = states;
 
     if (this.options?.immediate) {
       this.callBack(this.returnValue(states), undefined);
     }
-    
+
     this._effect = this.recalculate.bind(this);
     this.sub = this.deps.map((dep) => {
-      return core.track(dep, '$_val', this._effect!);
-    })
+      return core.track(dep, "$_val", this._effect!);
+    });
   }
 
   private recalculate() {
     const lastValue = this.lastValue;
     const states: unknown[] = [];
     this.deps.forEach((dep) => {
-      states.push(dep.get());
+      states.push(dep.value);
     });
 
-    this.callBack(this.returnValue(states), lastValue.length > 0 ? this.returnValue(lastValue) : undefined)
+    this.callBack(
+      this.returnValue(states),
+      lastValue.length > 0 ? this.returnValue(lastValue) : undefined,
+    );
     this.lastValue = states;
   }
 
@@ -59,7 +62,7 @@ class Watch {
     if (this.sub.length > 0) {
       this.sub.forEach((sub) => {
         sub.isActive = false;
-      })
+      });
     }
   }
 
@@ -67,12 +70,16 @@ class Watch {
     if (this.sub.length > 0) {
       this.sub.forEach((sub) => {
         sub.isActive = true;
-      })
+      });
     }
   }
 }
 
-export function watch(fn: CallbackWatch, deps: Reactive | Reactive[], options?: OptionsWatch) {
+export function watch(
+  fn: CallbackWatch,
+  deps: Reactive | Reactive[],
+  options?: OptionsWatch,
+) {
   const _deps = Array.isArray(deps) ? deps : [deps];
   return new Watch(fn, _deps, options);
 }

@@ -170,6 +170,13 @@ export class ComponentClass<T extends Props> {
     }
     this.render.unMounted();
   }
+
+  getElement() {
+    if (!this.render) {
+      return;
+    }
+    return this.render.getElement();
+  }
 }
 
 export function componentInstance<T extends Props>(

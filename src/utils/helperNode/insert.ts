@@ -1,5 +1,5 @@
 export function insert(
-  child: Element,
+  child: any,
   parent: Element,
   anchor: Node | null = null,
 ) {

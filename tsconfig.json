@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
+    "rootDir": "./src",
     "target": "es2020",
     "strict": true,
     "newLine": "LF",
@@ -11,7 +12,8 @@
     "isolatedModules": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
-    "jsxImportSource": "./src/components"
+    "jsxImportSource": "./src/components",
+    "experimentalDecorators": true
   },
   "include": [
     "./src/**/*"

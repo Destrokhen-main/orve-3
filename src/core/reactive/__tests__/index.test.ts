@@ -1,6 +1,6 @@
 import { computed } from "../computed";
 import { nextTick, setEffectOnces } from "../core";
-import { state } from "../state"
+import { state } from "../state";
 
 describe("reactive", () => {
   describe("basic reactive [primitive]", () => {
@@ -9,8 +9,8 @@ describe("reactive", () => {
 
       let i = 1;
       setEffectOnces(() => {
-        expect(a.get()).toBe(i);
-      })
+        expect(a.value).toBe(i);
+      });
 
       a.set(2);
       i = 2;
@@ -20,10 +20,10 @@ describe("reactive", () => {
       const a = state(1);
 
       const fn = jest.fn(() => {
-        a.get()
-      })
+        a.value;
+      });
 
-      setEffectOnces(fn)
+      setEffectOnces(fn);
 
       a.set(2);
       a.set(3);
@@ -34,15 +34,15 @@ describe("reactive", () => {
 
       await nextTick();
       expect(fn).toHaveBeenCalledTimes(2);
-    })
+    });
 
-    it('should correct get last number', () => {
+    it("should correct get last number", () => {
       const a = state(1);
 
-      let i = 1
+      let i = 1;
       setEffectOnces(() => {
-        expect(a.get()).toBe(i);
-      })
+        expect(a.value).toBe(i);
+      });
 
       a.set(2);
       a.set(3);
@@ -51,107 +51,107 @@ describe("reactive", () => {
       a.set(6);
       a.set(7);
       i = 7;
-    })
+    });
 
-    it('should correct update computed', async () => {
+    it("should correct update computed", async () => {
       const a = state(1);
 
       const b = computed(() => {
-        return a.get();
+        return a.value;
       });
 
-      expect(b.get()).toBe(1);
+      expect(b.value).toBe(1);
       a.set(2);
       await nextTick();
-      expect(b.get()).toBe(2);
-    })
+      expect(b.value).toBe(2);
+    });
 
-    it('should correct update 2 state in computed', async () => {
+    it("should correct update 2 state in computed", async () => {
       const a = state(1);
       const b = state(2);
 
       const c = computed(() => {
-        return a.get() + b.get();
-      })
+        return a.value + b.value;
+      });
 
-      expect(c.get()).toBe(3);
+      expect(c.value).toBe(3);
       a.set(2);
       b.set(3);
       await nextTick();
-      expect(c.get()).toBe(5);
-    })
+      expect(c.value).toBe(5);
+    });
 
-    it('should correct update computed', async () => {
+    it("should correct update computed", async () => {
       const flag = state(true);
       const a = state(1);
       const b = state(2);
 
       const fn = jest.fn(() => {
-        if (flag.get()) {
-          return a.get();
+        if (flag.value) {
+          return a.value;
         } else {
-          return b.get();
+          return b.value;
         }
-      })
+      });
 
       const c = computed(fn);
 
-      expect(c.get()).toBe(1);
+      expect(c.value).toBe(1);
       flag.set(false);
       await nextTick();
-      expect(c.get()).toBe(2);
+      expect(c.value).toBe(2);
       a.set(2);
       await nextTick();
-      expect(fn).toHaveBeenCalledTimes(2) 
-    })
+      expect(fn).toHaveBeenCalledTimes(2);
+    });
 
-    it('should correct update computed', async () => {
+    it("should correct update computed", async () => {
       const flag = state(true);
       const a = state(1);
       const b = state(2);
 
       const fn = jest.fn(() => {
-        if (flag.get()) {
-          return a.get();
+        if (flag.value) {
+          return a.value;
         } else {
-          return b.get();
+          return b.value;
         }
-      })
+      });
 
       const c = computed(fn);
 
       const dFn = jest.fn(() => {
-        return c.get()
-      })
+        return c.value;
+      });
       const d = computed(dFn);
-      d.get();
+      d.value;
 
-      expect(c.get()).toBe(1);
+      expect(c.value).toBe(1);
       flag.set(false);
       await nextTick();
-      expect(c.get()).toBe(2);
+      expect(c.value).toBe(2);
       a.set(2);
       await nextTick();
-      expect(fn).toHaveBeenCalledTimes(2)
+      expect(fn).toHaveBeenCalledTimes(2);
       expect(dFn).toHaveBeenCalledTimes(3);
-    })
+    });
 
-    it('should correct update computed (custom list dep)', async () => {
+    it("should correct update computed (custom list dep)", async () => {
       const a = state(1);
       const b = state(2);
 
       const fn = jest.fn(() => {
-        return a.get() + b.get()
-      })
+        return a.value + b.value;
+      });
 
       const c = computed(fn, { deps: [a] });
 
-      expect(c.get()).toBe(3);
+      expect(c.value).toBe(3);
       await nextTick();
 
-      b.set(b.get() + 1);
+      b.set(b.value + 1);
       await nextTick();
       expect(fn).toHaveBeenCalledTimes(1);
-    })
-  })
-})
+    });
+  });
+});

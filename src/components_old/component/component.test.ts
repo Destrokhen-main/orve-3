@@ -51,7 +51,7 @@ describe.skip("Component functions render", () => {
     const Comp = () => {
       a = state("hello");
 
-      return () => a.get();
+      return () => a.value;
     };
 
     setup(Comp);
@@ -66,7 +66,7 @@ describe.skip("Component functions render", () => {
     const Comp = () => {
       a = state(1);
 
-      return () => a.get();
+      return () => a.value;
     };
 
     setup(Comp);

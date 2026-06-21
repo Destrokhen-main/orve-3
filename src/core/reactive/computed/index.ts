@@ -8,12 +8,12 @@ export class Computed<T> {
 
   constructor(
     private callBack: () => T,
-    private options?: ComputedOptions
+    private options?: ComputedOptions,
   ) {}
 
-  get() {
+  get value() {
     if (effect) {
-      core.track(this, '$_val', effect);
+      core.track(this, "$_val", effect);
     }
     if (!this.init) {
       this.init = true;
@@ -32,12 +32,12 @@ export class Computed<T> {
 
       this._effect = () => {
         this._value = this.callBack();
-        core.trigger(this, '$_val');
-      }
+        core.trigger(this, "$_val");
+      };
 
       deps.forEach((dep) => {
-        core.track(dep, '$_val', this._effect!);
-      })
+        core.track(dep, "$_val", this._effect!);
+      });
       return;
     }
 
@@ -49,16 +49,16 @@ export class Computed<T> {
       if (isFisrtCalc) {
         isFisrtCalc = false;
         this._value = this.callBack();
-        core.trigger(this, '$_val');
+        core.trigger(this, "$_val");
       } else {
         this.proccessEffect();
       }
-    }
+    };
 
     setEffectOnces(this._effect);
   }
 }
 
-export function computed<T>(fn : () => T, options?: ComputedOptions) {
+export function computed<T>(fn: () => T, options?: ComputedOptions) {
   return new Computed(fn, options);
 }

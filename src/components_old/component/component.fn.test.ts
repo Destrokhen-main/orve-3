@@ -38,7 +38,7 @@ describe("Component FN", () => {
 
     it("should render state", async () => {
       const a = state("text");
-      const fn = () => a.get();
+      const fn = () => a.value;
       setup(fn);
       expect(document.body.innerHTML).toBe("<div>text</div>");
       a.set("hello");
@@ -48,30 +48,30 @@ describe("Component FN", () => {
 
     it("should render state number", async () => {
       const a = state(1);
-      const fn = () => a.get();
+      const fn = () => a.value;
       setup(fn);
       expect(document.body.innerHTML).toBe("<div>1</div>");
-      a.set(a.get() + 1);
+      a.set(a.value + 1);
       await nextTick();
       expect(document.body.innerHTML).toBe("<div>2</div>");
     });
 
     it("should set empty div", async () => {
       const a = state(1);
-      const fn = () => (a.get() === 1 ? "yes" : null);
+      const fn = () => (a.value === 1 ? "yes" : null);
       setup(fn);
       expect(document.body.innerHTML).toBe("<div>yes</div>");
-      a.set(a.get() + 1);
+      a.set(a.value + 1);
       await nextTick();
       expect(document.body.innerHTML).toBe("<div></div>");
     });
 
     it("should set value start with null", async () => {
       const a = state(1);
-      const fn = () => (a.get() === 1 ? null : "yes");
+      const fn = () => (a.value === 1 ? null : "yes");
       setup(fn);
       expect(document.body.innerHTML).toBe("<div></div>");
-      a.set(a.get() + 1);
+      a.set(a.value + 1);
       await nextTick();
       expect(document.body.innerHTML).toBe("<div>yes</div>");
     });
@@ -99,7 +99,7 @@ describe("Component FN", () => {
     it("should correct render node -> textNode", async () => {
       const a = state(true);
       setup(() => {
-        return a.get() ? render("p", { children: "text" }) : null;
+        return a.value ? render("p", { children: "text" }) : null;
       });
       expect(document.body.innerHTML).toBe("<div><p>text</p></div>");
       a.set(false);

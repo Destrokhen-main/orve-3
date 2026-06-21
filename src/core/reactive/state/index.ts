@@ -12,7 +12,7 @@ export class State<T> {
     this._value = value;
   }
 
-  get() {
+  get value() {
     if (effect) {
       core.track(this, "$_val", effect);
     }

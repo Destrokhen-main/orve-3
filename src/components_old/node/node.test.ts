@@ -2,6 +2,7 @@ import { JSX } from "react";
 import { Node } from "./index";
 import { state } from "../../core/reactive/state";
 import { nextTick } from "../../core/reactive/core";
+import { FRAGMENT } from "../component/constants";
 
 describe("Node", () => {
   const root = document.createElement("div");
@@ -259,8 +260,8 @@ describe("Node", () => {
               return () => ({
                 type: "p",
                 props: {
-                  ...(a.get() ? { id } : { class: id }),
-                  children: a.get() ? "true state" : "false state",
+                  ...(a.value ? { id } : { class: id }),
+                  children: a.value ? "true state" : "false state",
                 },
                 key: null,
               });
@@ -289,7 +290,34 @@ describe("Node", () => {
     });
   });
 
-  describe("type", () => {});
+  describe("type", () => {
+    it.only("change node", () => {
+      const el: JSX.Element = {
+        type: "div",
+        props: {
+          children: ["text-1", "text-2"],
+        },
+        key: null,
+      };
+
+      const node = new Node(el, { isFnNode: true });
+      node.setup();
+      node.mounted(root);
+
+      expect(document.body.innerHTML).toBe(
+        "<div><div>text-1text-2</div></div>",
+      );
+
+      node.reMounted({
+        type: FRAGMENT,
+        props: {
+          children: ["text-1", "text-2"],
+        },
+        key: null,
+      });
+      expect(document.body.innerHTML).toBe("<div>text-1text-2</div>");
+    });
+  });
 
   describe("props", () => {
     beforeEach(() => {

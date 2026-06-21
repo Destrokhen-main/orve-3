@@ -7,8 +7,8 @@ import {
   remove,
   replaceElement,
   setText,
-} from "../helperNode";
-import { stringValue } from "../helperNode/stringValue";
+} from "../../utils/helperNode";
+import { stringValue } from "../../utils/helperNode/stringValue";
 
 export class TextNode {
   private element: Text | null = null;
@@ -20,7 +20,7 @@ export class TextNode {
 
     if (this.text instanceof State || this.text instanceof Computed) {
       this.effect = () => {
-        setText(this.element, stringValue(this.text));
+        setText(this.element!, stringValue(this.text));
       };
 
       setEffectOnces(this.effect);
@@ -37,7 +37,7 @@ export class TextNode {
 
   reMounted(text: string | number | State<any> | Computed<any>) {
     if (this.text !== text) {
-      setText(this.element, stringValue(text));
+      setText(this.element!, stringValue(text));
     }
   }
 
@@ -50,7 +50,7 @@ export class TextNode {
       core.deleteByEffect(this.effect);
     }
 
-    remove(this.element, !!this.element?.parentNode);
+    remove(this.element!, !!this.element?.parentNode);
     this.element = null;
   }
 }

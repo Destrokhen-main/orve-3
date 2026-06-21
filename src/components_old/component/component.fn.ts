@@ -93,4 +93,8 @@ export class ComponentFn {
 
     this.lastRender = render;
   }
+
+  getElement() {
+    return this.elements;
+  }
 }
