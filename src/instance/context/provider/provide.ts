@@ -6,5 +6,5 @@ export function provide<T>(key: string | symbol, value: T) {
     return;
   }
 
-  cxt[key] = value;
+  cxt.provide[key] = value;
 }

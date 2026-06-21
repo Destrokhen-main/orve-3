@@ -6,5 +6,5 @@ export function inject<T>(key: string | symbol, defaultValue: T) {
     return defaultValue;
   }
 
-  return (cxt[key] as T) ?? defaultValue;
+  return (cxt.provide[key] as T) ?? defaultValue;
 }

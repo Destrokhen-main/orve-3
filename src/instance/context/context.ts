@@ -1,5 +1,12 @@
-export let cxt: Record<string, unknown> | null = null;
+import { ComponentOptions } from "./defines/types";
 
-export function setContext(_cxt: Record<string, unknown> | null) {
+export type ContextType = {
+  provide: Record<string | symbol, unknown>,
+  options: ComponentOptions;
+}
+
+export let cxt: ContextType | null = null;
+
+export function setContext(_cxt: ContextType | null) {
   cxt = _cxt;
 }
