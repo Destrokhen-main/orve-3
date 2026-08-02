@@ -5,6 +5,8 @@ import { Single } from "./cases/Single/Single";
 import { BaseInput } from "./cases/BaseInput/BaseInput";
 import { PropsDrilling } from "./cases/PropsDrilling/PropsDrilling";
 import { Styles } from "./cases/Styles/Styles";
+import { Classes } from "./cases/Classes/Classes";
+import { AsyncCase } from "./cases/AsyncCase/Async";
 
 
 const App = () => {
@@ -23,6 +25,10 @@ const App = () => {
       return PropsDrilling
     } else if (page.value === 5) {
       return Styles
+    } else if (page.value === 6) {
+      return Classes
+    } else if (page.value === 7) {
+      return AsyncCase
     }
 
     return null;
@@ -35,6 +41,8 @@ const App = () => {
       <button class={page.value === 3 ? "active" : ""} onClick={() => page.set(3)}>Case 1</button>
       <button class={page.value === 4 ? "active" : ""} onClick={() => page.set(4)}>Case 2</button>
       <button class={page.value === 5 ? "active" : ""} onClick={() => page.set(5)}>Styles</button>
+      <button class={page.value === 6 ? "active" : ""} onClick={() => page.set(6)}>Classes</button>
+      <button class={page.value === 7 ? "active" : ""} onClick={() => page.set(7)}>Async</button>
       <div class="mt-2">
         <Component is={switchComp.value} />
       </div>
