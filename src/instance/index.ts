@@ -1,3 +1,4 @@
+import { Fn } from "../types";
 import { OrvePlugin } from "./plugins/plugins";
 import { OrvePluginType } from "./plugins/types";
 import { OrveInstanceType } from "./types";
@@ -7,7 +8,7 @@ export class OrveInstance {
     plugins: {},
   };
 
-  constructor() {}
+  constructor() { }
 
   use(plugin: OrvePluginType) {
     const _plugin = new OrvePlugin(this.instance.plugins, plugin);
@@ -23,10 +24,11 @@ export class OrveInstance {
     return this.instance.plugins;
   }
 
-  rootComponent(app: any) {
-    
+  rootComponent(app: Fn<Record<string, unknown>>) {
+    return this;
   }
-  mountRoot(el: HTMLElement | string) {}
+
+  mountRoot(el: HTMLElement | string) { }
 }
 
 export function createInstance() {

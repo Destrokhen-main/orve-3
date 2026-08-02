@@ -12,7 +12,6 @@
     "isolatedModules": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
-    "jsxImportSource": "./src/components",
     "experimentalDecorators": true
   },
   "include": [

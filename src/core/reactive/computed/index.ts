@@ -1,61 +1,56 @@
-import { core, effect, setEffectOnces } from "../core";
+import { core, Effect, untrack } from "../core";
 import { ComputedOptions } from "./types";
 
 export class Computed<T> {
-  private init = false;
-  private _value: T | undefined;
-  private _effect: (() => void) | null = null;
+  private _value!: T;
+  private dirty = true;
+  private effect: Effect<T>;
 
-  constructor(
-    private callBack: () => T,
-    private options?: ComputedOptions,
-  ) {}
+  constructor(callBack: () => T, options?: ComputedOptions) {
+    const deps = options?.deps;
 
-  get value() {
-    if (effect) {
-      core.track(this, "$_val", effect);
+    const compute: () => T = deps
+      ? () => {
+          // читаем только объявленные зависимости, само вычисление — без трекинга
+          deps.forEach((dep) => dep.value);
+          return untrack(callBack);
+        }
+      : callBack;
+
+    this.effect = new Effect(compute, {
+      // изменение зависимости не пересчитывает значение, а только помечает его грязным
+      scheduler: () => this.invalidate(),
+    });
+  }
+
+  get value(): T {
+    core.track(this);
+
+    if (this.dirty) {
+      this.dirty = false;
+      this._value = this.effect.run();
     }
-    if (!this.init) {
-      this.init = true;
-      this.proccessEffect();
-    }
+
     return this._value;
   }
 
-  proccessEffect() {
-    let isFisrtCalc = true;
+  /** Прочитать без подписки текущего эффекта. */
+  peek(): T {
+    return untrack(() => this.value);
+  }
 
-    if (this.options?.deps) {
-      const deps = this.options.deps;
+  /** Отписаться от всех зависимостей. */
+  stop() {
+    this.effect.stop();
+  }
 
-      this._value = this.callBack();
-
-      this._effect = () => {
-        this._value = this.callBack();
-        core.trigger(this, "$_val");
-      };
-
-      deps.forEach((dep) => {
-        core.track(dep, "$_val", this._effect!);
-      });
+  private invalidate() {
+    if (this.dirty) {
       return;
     }
 
-    if (this._effect) {
-      core.deleteByEffect(this._effect);
-    }
-
-    this._effect = () => {
-      if (isFisrtCalc) {
-        isFisrtCalc = false;
-        this._value = this.callBack();
-        core.trigger(this, "$_val");
-      } else {
-        this.proccessEffect();
-      }
-    };
-
-    setEffectOnces(this._effect);
+    this.dirty = true;
+    core.trigger(this);
   }
 }
 

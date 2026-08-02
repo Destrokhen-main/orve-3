@@ -133,7 +133,12 @@ describe("reactive", () => {
       a.set(2);
       await nextTick();
       expect(fn).toHaveBeenCalledTimes(2);
-      expect(dFn).toHaveBeenCalledTimes(3);
+
+      // d ленивый: пока его не читают, он не пересчитывается,
+      // но инвалидация через c до него дошла
+      expect(dFn).toHaveBeenCalledTimes(1);
+      expect(d.value).toBe(2);
+      expect(dFn).toHaveBeenCalledTimes(2);
     });
 
     it("should correct update computed (custom list dep)", async () => {

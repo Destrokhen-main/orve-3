@@ -1,77 +1,62 @@
-import { core } from "../core";
-import { Effect } from "../core/effect";
+import { Effect, untrack } from "../core";
 import { Reactive } from "../core/types";
 import { CallbackWatch, OptionsWatch } from "./types";
 
 class Watch {
-  private _effect: (() => void) | null = null;
-  private lastValue: unknown[] = [];
-  private sub: Effect[] = [];
+  private effect: Effect<unknown[]>;
+  private lastValue: unknown[];
 
   constructor(
     private callBack: CallbackWatch,
     private deps: Reactive[],
-    private options?: OptionsWatch,
+    options?: OptionsWatch,
   ) {
-    this.connect();
+    // первичное чтение — вне трекинга, иначе watch внутри рендера
+    // подпишет на свои источники ещё и рендер-эффект
+    this.lastValue = untrack(() => this.read());
+
+    this.effect = new Effect(() => this.read(), {
+      job: () => this.run(),
+    });
+    this.effect.run();
+
+    if (options?.immediate) {
+      this.callBack(this.returnValue(this.lastValue), undefined);
+    }
+  }
+
+  private read() {
+    return this.deps.map((dep) => dep.value);
   }
 
   private returnValue(state: unknown[]) {
     return state.length > 1 ? state : state[0];
   }
 
-  private connect() {
-    const states: unknown[] = [];
-    this.deps.forEach((dep) => {
-      states.push(dep.value);
-    });
-    this.lastValue = states;
-
-    if (this.options?.immediate) {
-      this.callBack(this.returnValue(states), undefined);
-    }
-
-    this._effect = this.recalculate.bind(this);
-    this.sub = this.deps.map((dep) => {
-      return core.track(dep, "$_val", this._effect!);
-    });
-  }
-
-  private recalculate() {
-    const lastValue = this.lastValue;
-    const states: unknown[] = [];
-    this.deps.forEach((dep) => {
-      states.push(dep.value);
-    });
+  private run() {
+    const oldValue = this.lastValue;
+    // прогон через effect — заодно перезаписывает зависимости
+    const newValue = this.effect.run();
+    this.lastValue = newValue;
 
     this.callBack(
-      this.returnValue(states),
-      lastValue.length > 0 ? this.returnValue(lastValue) : undefined,
+      this.returnValue(newValue),
+      oldValue.length > 0 ? this.returnValue(oldValue) : undefined,
     );
-    this.lastValue = states;
   }
 
+  /** Отписаться навсегда. */
   un() {
-    if (this._effect) {
-      core.deleteByEffect(this._effect);
-      this.sub = [];
-    }
+    this.effect.stop();
   }
 
+  /** Приостановить: изменения, пришедшие во время паузы, догонят одним вызовом после `resume()`. */
   pause() {
-    if (this.sub.length > 0) {
-      this.sub.forEach((sub) => {
-        sub.isActive = false;
-      });
-    }
+    this.effect.pause();
   }
 
   resume() {
-    if (this.sub.length > 0) {
-      this.sub.forEach((sub) => {
-        sub.isActive = true;
-      });
-    }
+    this.effect.resume();
   }
 }
 

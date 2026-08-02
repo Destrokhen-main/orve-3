@@ -1,133 +1,100 @@
-import { Effect } from "./effect";
-import { Reactive } from "./types";
+import { Effect, EffectOptions } from "./effect";
+import { Job, scheduler } from "./scheduler";
+import { getActiveEffect } from "./stack";
+import { VALUE_KEY } from "./types";
 
-export let effect: (() => void) | null = null;
-export function setEffectOnces(fn: () => void) {
-  effect = fn;
-  fn();
-  effect = null;
-}
+/** Эффекты, созданные через устаревший `setEffectOnces` — чтобы их можно было остановить по ссылке на fn. */
+const legacyEffects = new WeakMap<() => void, Effect<unknown>>();
 
 class Core {
-  private quee: Set<() => void> = new Set();
-  private stateMap = new WeakMap<Reactive, Map<string, Set<Effect>>>();
-  private subscribersEffect = new WeakMap<
-    () => void,
-    Map<string, Set<Reactive>>
-  >();
-  private pending = false;
+  private targetMap = new WeakMap<object, Map<string, Set<Effect<any>>>>();
 
-  add(fn: () => void) {
-    this.quee.add(fn);
-
-    if (!this.pending) {
-      this.proccessWorker();
-    }
-  }
-
-  private proccessWorker() {
-    if (!this.pending) {
-      this.pending = true;
-      queueMicrotask(() => {
-        this.pending = false;
-        this.quee.forEach((f) => f());
-        this.quee = new Set();
-      });
-    }
-  }
-
-  cancelTask(fn: () => void) {
-    this.quee.delete(fn);
-  }
-
-  deleteState(target: Reactive, key: string, fn: () => void) {
-    const map = this.stateMap.get(target);
-    if (!map) {
+  /** Подписать активный эффект на `target[key]`. Повторный вызов ничего не дублирует. */
+  track(target: object, key: string = VALUE_KEY) {
+    const effect = getActiveEffect();
+    if (!effect || !effect.active) {
       return;
     }
 
-    if (map.has(key)) {
-      map.delete(key);
-    }
-  }
-
-  deleteByEffect(fn: () => void) {
-    this.cancelTask(fn);
-    const reactives = this.subscribersEffect.get(fn);
-
-    if (!reactives) {
-      return;
-    }
-
-    for (const [key, value] of reactives.entries()) {
-      value.forEach((r) => {
-        this.deleteState(r, key, fn);
-      });
-    }
-    this.subscribersEffect.delete(fn);
-  }
-
-  track(target: Reactive, key: string, fn: () => void) {
-    let map = this.stateMap.get(target);
-
+    let map = this.targetMap.get(target);
     if (!map) {
       map = new Map();
-      this.stateMap.set(target, map);
+      this.targetMap.set(target, map);
     }
 
-    let keySet = map.get(key);
-
-    if (!keySet) {
-      keySet = new Set();
-      map.set(key, keySet);
+    let dep = map.get(key);
+    if (!dep) {
+      dep = new Set();
+      map.set(key, dep);
     }
 
-    const effect = new Effect(fn);
-    keySet.add(effect);
-
-    let setEffect = this.subscribersEffect.get(effect.fn);
-    if (!setEffect) {
-      setEffect = new Map();
-      this.subscribersEffect.set(effect.fn, setEffect);
+    if (!dep.has(effect)) {
+      dep.add(effect);
+      // обратная ссылка — чтобы эффект умел точечно отписаться сам
+      effect.deps.push(dep);
     }
-
-    let set = setEffect.get(key);
-    if (!set) {
-      set = new Set();
-      setEffect.set(key, set);
-    }
-
-    set.add(target);
-
-    return effect;
   }
 
-  trigger(target: Reactive, key: string) {
-    const map = this.stateMap.get(target);
-    if (!map) {
+  trigger(target: object, key: string = VALUE_KEY) {
+    const dep = this.targetMap.get(target)?.get(key);
+    if (!dep || dep.size === 0) {
       return;
     }
 
-    const set = map.get(key);
-    if (!set) {
-      return;
-    }
-
-    set.forEach((f) => {
-      if (f.isActive) {
-        this.add(f.fn);
-      }
-    });
-  }
-}
-
-export async function nextTick(fn?: () => void) {
-  if (fn) {
-    await new Promise((r) => r(true));
-    return fn();
+    // копия: notify может перестроить набор подписчиков
+    [...dep].forEach((effect) => effect.notify());
   }
 
-  return new Promise((r) => r(true));
+  add(job: Job) {
+    scheduler.add(job);
+  }
+
+  cancel(job: Job) {
+    scheduler.cancel(job);
+  }
+
+  /** @deprecated используйте `Effect.stop()`. */
+  deleteByEffect(fn: () => void) {
+    legacyEffects.get(fn)?.stop();
+    legacyEffects.delete(fn);
+  }
 }
 
 export const core = new Core();
+
+/**
+ * Реактивный эффект: выполняется сразу и перезапускается при изменении
+ * прочитанных зависимостей, с полным пере-трекингом на каждом прогоне.
+ */
+export function effect(fn: () => void, options?: EffectOptions) {
+  const _effect = new Effect(fn, options);
+  _effect.run();
+  return _effect;
+}
+
+/** @deprecated используйте `effect()` — он возвращает объект с `stop()`. */
+export function setEffectOnces(fn: () => void) {
+  const existing = legacyEffects.get(fn);
+  if (existing?.active) {
+    existing.run();
+    return existing;
+  }
+
+  const _effect = effect(fn);
+  legacyEffects.set(fn, _effect);
+  return _effect;
+}
+
+export { cleanup, Effect } from "./effect";
+export type { EffectOptions } from "./effect";
+export { flushSync, nextTick } from "./scheduler";
+export type { Job } from "./scheduler";
+export {
+  EffectScope,
+  effectScope,
+  getCurrentScope,
+  onScopeDispose,
+} from "./scope";
+export { getActiveEffect, untrack } from "./stack";
+export { VALUE_KEY } from "./types";
+export type { Reactive } from "./types";

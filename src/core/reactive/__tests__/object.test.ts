@@ -17,6 +17,8 @@ describe("reactive - object", () => {
     obj.set({ ...obj.value, a: 2 });
 
     await nextTick();
+    // computed ленивый: пересчёт происходит на чтении
+    expect(b.value).toBe(2);
     expect(fn).toHaveBeenCalledTimes(2);
   });
 
@@ -33,6 +35,7 @@ describe("reactive - object", () => {
     obj.set(newArray);
 
     await nextTick();
+    expect(b.value).toBe(2);
     expect(fn).toHaveBeenCalledTimes(2);
   });
 });
