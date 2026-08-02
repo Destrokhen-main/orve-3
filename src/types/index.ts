@@ -1,3 +1,13 @@
-import { JSX } from "react";
+export type {
+  Child,
+  ComponentFn,
+  MaybeReactive,
+  Props,
+  Render,
+  VNode,
+} from "../runtime/types";
 
-export type Fn<T extends { children: JSX.Element, [key: string]: unknown }> = (props: T) => () => JSX.Element
+import type { ComponentFn, Props } from "../runtime/types";
+
+/** @deprecated используйте `ComponentFn` */
+export type Fn<T extends Props = Props> = ComponentFn<T>;

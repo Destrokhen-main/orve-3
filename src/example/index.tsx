@@ -1,9 +1,12 @@
+import { state } from "../core/reactive";
 import { createInstance } from "../instance";
 
 const Component = () => {
+  const a = state(1);
+
   return () => (
     <>
-      <div>Hello world</div>
+      <div>{a.value}</div>
     </>
   )
 }

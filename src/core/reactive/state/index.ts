@@ -24,18 +24,25 @@ export class State<T> {
     return this._value;
   }
 
-  set(newValue: T) {
-    if (!this.hasChanged(newValue)) {
+  /**
+   * Новое значение либо функция-апдейтер от текущего.
+   *
+   * `T` не ограничен, поэтому сам может быть функцией — различить их
+   * невозможно, и функция всегда трактуется как апдейтер. Чтобы положить
+   * в состояние саму функцию, верни её из апдейтера: `set(() => fn)`.
+   */
+  set(newValue: T | ((current: T) => T)) {
+    const val =
+      typeof newValue === "function"
+        ? (newValue as (current: T) => T)(this._value)
+        : newValue;
+
+    if (!this.hasChanged(val)) {
       return;
     }
 
-    this._value = newValue;
+    this._value = val;
     core.trigger(this);
-  }
-
-  /** Обновить на основе текущего значения, не подписываясь на него. */
-  update(fn: (current: T) => T) {
-    this.set(fn(this._value));
   }
 
   private hasChanged(newValue: T) {

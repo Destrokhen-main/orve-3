@@ -12,6 +12,12 @@
     "isolatedModules": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
+    "jsxImportSource": "orve",
+    "paths": {
+      "orve": ["./src/index.ts"],
+      "orve/jsx-runtime": ["./src/jsx-runtime.ts"],
+      "orve/jsx-dev-runtime": ["./src/jsx-dev-runtime.ts"]
+    },
     "experimentalDecorators": true
   },
   "include": [
@@ -19,7 +25,8 @@
   ],
   "exclude": [
     "./node_modules/**/*",
-    "**/*.test.ts", 
-    "**/*.mock.ts"
+    "**/*.test.ts",
+    "**/*.mock.ts",
+    "./src/components_old/**/*"
   ]
 }

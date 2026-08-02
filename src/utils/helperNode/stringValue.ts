@@ -1,7 +1,8 @@
 import { Computed } from "../../core/reactive/computed";
 import { State } from "../../core/reactive/state";
 import { getType } from "../../core/utlils";
-import { PRIMITIVE } from "../../components_old/component/constants";
+
+const PRIMITIVE = ["string", "number", "boolean"];
 
 export function stringValue(item: unknown) {
   if (PRIMITIVE.includes(typeof item)) {

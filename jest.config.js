@@ -6,4 +6,10 @@ module.exports = {
   testMatch: ["**/__tests__/**/*.test.(ts|tsx)", "**/*.test.(ts|tsx)"],
   coverageProvider: "v8",
   coverageDirectory: "coverage",
+  // tsconfig указывает jsxImportSource: "orve" — резолвим его на исходники
+  moduleNameMapper: {
+    "^orve/jsx-dev-runtime$": "<rootDir>/src/jsx-dev-runtime.ts",
+    "^orve/jsx-runtime$": "<rootDir>/src/jsx-runtime.ts",
+    "^orve$": "<rootDir>/src/index.ts",
+  },
 };
