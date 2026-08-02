@@ -73,3 +73,14 @@ ul {
 .active {
   background-color: green;
 }
+
+.mt-2 {
+  margin-top: 12px;
+}
+
+.buble {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: red;
+}

@@ -23,7 +23,14 @@ export type {
   StateOptions,
 } from "./core/reactive";
 
-export { isSingle, single } from "./components/component";
+export {
+  isSingle,
+  onBeforeUnmounted,
+  onMounted,
+  onUnmounted,
+  single,
+} from "./components/component";
+export type { LifecycleHook } from "./components/component";
 export { createInstance, OrveInstance } from "./instance";
 export { Component, For, If } from "./components/component-orve";
 export type {

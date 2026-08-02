@@ -6,6 +6,15 @@ import { patch } from "../../runtime/patch";
 import { Child, ComponentFn, Render, View, VNode } from "../../runtime/types";
 import { BaseView } from "../../runtime/views/base";
 import { createComment } from "../../utils/helperNode";
+import {
+  Hooks,
+  beginMount,
+  createHooks,
+  endMount,
+  popHooks,
+  pushHooks,
+  runHooks,
+} from "./lifecycle";
 import { ReactiveProps } from "./props";
 import { isSingle } from "./single";
 
@@ -23,6 +32,8 @@ export class ComponentView extends BaseView {
   private props: ReactiveProps | null = null;
   private render: Render | null = null;
   private readonly ns: NS = getNS();
+  private readonly hooks: Hooks = createHooks();
+  private destroyed = false;
 
   constructor(
     private vnode: VNode,
@@ -37,24 +48,38 @@ export class ComponentView extends BaseView {
     this.anchor = createComment("");
     parent.insertBefore(this.anchor, anchor);
 
-    this.scope.run(() => {
-      this.props = new ReactiveProps(this.vnode.props);
-      // setup не должен ничего трекать: это не реактивное вычисление
-      this.render = untrack(() => this.fn(this.props!.proxy));
+    beginMount();
+    try {
+      this.scope.run(() => {
+        this.props = new ReactiveProps(this.vnode.props);
 
-      if (isSingle(this.fn)) {
-        this.applyTree(untrack(this.render));
-        return;
-      }
+        // setup не должен ничего трекать: это не реактивное вычисление.
+        // На время вызова компонент становится текущим — сюда пишут хуки.
+        pushHooks(this.hooks);
+        try {
+          this.render = untrack(() => this.fn(this.props!.proxy));
+        } finally {
+          popHooks();
+        }
 
-      effect(() => {
-        const next = this.render!();
-        // работа с DOM не должна попадать в зависимости render-эффекта
-        untrack(() => this.scope.run(() => this.applyTree(next)));
+        if (isSingle(this.fn)) {
+          this.applyTree(untrack(this.render));
+          return;
+        }
+
+        effect(() => {
+          const next = this.render!();
+          // работа с DOM не должна попадать в зависимости render-эффекта
+          untrack(() => this.scope.run(() => this.applyTree(next)));
+        });
       });
-    });
 
-    this.mounted = true;
+      this.mounted = true;
+    } finally {
+      // onMounted откладывается до конца самого внешнего монтирования:
+      // только тогда узлы этого поддерева стоят в документе
+      endMount(this.hooks.mounted);
+    }
   }
 
   update(next: Child): boolean {
@@ -74,11 +99,22 @@ export class ComponentView extends BaseView {
   }
 
   unmount() {
+    if (this.destroyed) {
+      return;
+    }
+    this.destroyed = true;
+
+    // DOM ещё на месте, эффекты ещё живы
+    runHooks(this.hooks.beforeUnmounted, "onBeforeUnmounted");
+
     this.root?.unmount();
     this.root = null;
     super.unmount();
     this.anchor?.parentNode?.removeChild(this.anchor);
     this.anchor = null;
+
+    // узлы сняты, область эффектов остановлена
+    runHooks(this.hooks.unmounted, "onUnmounted");
   }
 
   private applyTree(next: Child) {
