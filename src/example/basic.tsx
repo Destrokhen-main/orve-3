@@ -23,7 +23,7 @@ const Counter = () => {
       {/* условие обычным JS: структура дерева свободно меняется */}
       {count.value > 3 && <b>много</b>}
 
-      <button onClick={() => count.update((v) => v + 1)}>+1</button>
+      <button onClick={() => count.set((v) => v + 1)}>+1</button>
     </div>
   );
 };
@@ -37,7 +37,7 @@ const TodoList = () => {
 
   const add = () => {
     // новая ссылка — иначе Object.is не увидит изменения
-    items.update((list) => [...list, `пункт ${list.length + 1}`]);
+    items.set((list) => [...list, `пункт ${list.length + 1}`]);
   };
 
   return () => (

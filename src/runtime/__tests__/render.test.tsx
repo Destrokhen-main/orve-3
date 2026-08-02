@@ -1,5 +1,5 @@
 import { single } from "../../components/component";
-import { For, Show } from "../../components/component-orve";
+import { For, If } from "../../components/component-orve";
 import { computed, nextTick, state } from "../../core/reactive";
 import { createInstance } from "../../instance";
 import { ComponentFn } from "../types";
@@ -220,13 +220,15 @@ describe("рендер", () => {
       expect(view.html).toBe('<div class="hot"></div>');
     });
 
-    it("Show переключает поддерево", async () => {
+    it("If переключает поддерево", async () => {
       const visible = state(false);
       const App = single(() => () => (
         <div>
-          <Show when={visible} fallback={() => <i>нет</i>}>
-            {() => <b>есть</b>}
-          </Show>
+          <If
+            when={visible}
+            then={() => <b>есть</b>}
+            else={() => <i>нет</i>}
+          />
         </div>
       ));
 
@@ -240,12 +242,14 @@ describe("рендер", () => {
       expect(view.app.querySelector("i")).toBeNull();
     });
 
-    it("Show принимает условие тонком", async () => {
+    it("If принимает условие тонком", async () => {
       const count = state(0);
       const App = single(() => () => (
-        <Show when={() => count.value > 1} fallback={() => <i>мало</i>}>
-          {() => <b>много</b>}
-        </Show>
+        <If
+          when={() => count.value > 1}
+          then={() => <b>много</b>}
+          else={() => <i>мало</i>}
+        />
       ));
 
       const view = mount(App);
@@ -269,7 +273,7 @@ describe("рендер", () => {
       const view = mount(App);
       expect(view.app.querySelectorAll("li").length).toBe(1);
 
-      items.update((list) => [...list, "b"]);
+      items.set((list) => [...list, "b"]);
       await nextTick();
       expect(view.app.querySelectorAll("li").length).toBe(2);
     });
@@ -289,7 +293,7 @@ describe("рендер", () => {
         ["a", "b"],
       );
 
-      items.update((list) => [...list, "c"]);
+      items.set((list) => [...list, "c"]);
       await nextTick();
 
       expect([...view.app.querySelectorAll("li")].map((li) => li.textContent)).toStrictEqual(
@@ -338,7 +342,7 @@ describe("рендер", () => {
       const view = mount(App);
       expect(view.app.querySelectorAll("li").length).toBe(1);
 
-      items.update((list) => [...list, "b"]);
+      items.set((list) => [...list, "b"]);
       await nextTick();
 
       expect(view.app.querySelectorAll("li").length).toBe(2);
@@ -369,7 +373,7 @@ describe("рендер", () => {
       const Row = single(() => () => <span>{bind}</span>);
       const App = single(() => () => (
         <div>
-          <Show when={visible}>{() => <Row />}</Show>
+          <If when={visible} then={() => <Row />} />
         </div>
       ));
 

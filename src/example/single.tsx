@@ -1,6 +1,6 @@
 import { computed, state } from "../core/reactive";
 import { single } from "../components/component";
-import { For, Show } from "../components/component-orve";
+import { For, If } from "../components/component-orve";
 
 /**
  * СИНГЛ режим — объявляется маркером `single`.
@@ -26,7 +26,7 @@ const Counter = single(() => {
       <div class={() => (count.value > 3 ? "hot" : "cold")} />
 
       {/* пропсы с `on` — всегда обработчики, а не тонки */}
-      <button onClick={() => count.update((v) => v + 1)}>+1</button>
+      <button onClick={() => count.set((v) => v + 1)}>+1</button>
     </div>
   );
 });
@@ -43,7 +43,7 @@ const Dynamic = single(() => {
     <div>
       {/* НЕ работает в сингле: выполнится один раз со значением false
           {visible.value && <b>виден</b>} */}
-      <Show when={visible}>{() => <b>виден</b>}</Show>
+      <If when={visible} then={() => <b>виден</b>} />
 
       <ul>
         {/* For отдаёт значение строки и её индекс; key — чтобы строки
@@ -53,7 +53,7 @@ const Dynamic = single(() => {
         </For>
       </ul>
 
-      <button onClick={() => visible.update((v) => !v)}>переключить</button>
+      <button onClick={() => visible.set((v) => !v)}>переключить</button>
     </div>
   );
 });

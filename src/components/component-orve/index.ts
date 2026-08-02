@@ -1,2 +1,3 @@
 export { For } from "./For";
-export { Show } from "./Show";
+export { If } from "./If";
+export { Component } from './Component';

@@ -25,7 +25,11 @@ export type {
 
 export { isSingle, single } from "./components/component";
 export { createInstance, OrveInstance } from "./instance";
-export { For, Show } from "./components/component-orve";
+export { Component, For, If } from "./components/component-orve";
+export type {
+  ComponentProps,
+  DynamicTarget,
+} from "./components/component-orve/Component";
 
 export { Fragment, jsx, jsxs } from "./runtime/jsx";
 export { createView, mountChild } from "./runtime/mount";

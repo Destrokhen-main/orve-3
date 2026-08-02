@@ -35,7 +35,9 @@ export class ReactiveProps {
 
       const cell = this.cells.get(key);
       if (cell && !this.signals.has(key)) {
-        cell.set(value);
+        // через апдейтер: проп может быть функцией (компонент, колбэк),
+        // а `set` трактует переданную функцию как апдейтер
+        cell.set(() => value);
         continue;
       }
 
@@ -47,7 +49,7 @@ export class ReactiveProps {
     // пропы, которых больше нет
     for (const key of this.cells.keys()) {
       if (!(key in raw)) {
-        this.cells.get(key)!.set(undefined);
+        this.cells.get(key)!.set(() => undefined);
       }
     }
   }

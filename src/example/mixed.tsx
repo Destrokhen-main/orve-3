@@ -32,7 +32,7 @@ export const Mixed = () => {
       {/* ВАЖНО: деструктуризация пропсов рвёт реактивность —
           const { count } = props; заберёт значение один раз */}
 
-      <button onClick={() => count.update((v) => v + 1)}>+1</button>
+      <button onClick={() => count.set((v) => v + 1)}>+1</button>
     </div>
   );
 };
@@ -66,7 +66,7 @@ export const MixedReverse = single(() => {
   return () => (
     <div>
       <Rows items={items} />
-      <button onClick={() => items.update((list) => [...list, "ещё"])}>
+      <button onClick={() => items.set((list) => [...list, "ещё"])}>
         добавить
       </button>
     </div>
