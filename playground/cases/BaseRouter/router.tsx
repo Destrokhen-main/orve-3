@@ -1,4 +1,4 @@
-import { Component, ComponentFn, computed, defineOptions, OrvePluginType, requirePlugin, State, state } from "orve";
+import { Component, ComponentFn, computed, defineOptions, DynamicTarget, jsx, OrvePluginType, Props, requirePlugin, State, state, VNode } from "orve";
 
 type Route = {
   name: string,
@@ -83,34 +83,38 @@ function createRouter(routers: Route[], mode: 'hash' | 'history' = 'history'): O
   }
 }
 
+function forward(props: Props): Props {
+  const forwarded: Props = {};
+
+  for (const key of Object.keys(props)) {
+    forwarded[key] = props[key];
+  }
+
+  return forwarded;
+}
+
 export const RouterLink: ComponentFn = (props) => {
-  defineOptions({
-    single: true
-  })
-
   const router = requirePlugin('$router') as any;
-  const currentRoute = router.currentRoute() as State<Route>;
+  const currentRoute = router.currentRoute() as State<Route | null>;
 
-  const component = computed(() => {
-    return currentRoute.value.component;
-  })
-
-  return () => (
-    <Component is={component}>
-      {props.children}
-    </Component>
-  )
+  return () => {
+    const component = currentRoute.value?.component;
+    if (!component) {
+      return null;
+    }
+    return jsx(component as ComponentFn<any>, forward(props))
+  }
 }
 
 export const router = createRouter([
   {
     path: '/',
-    component: (props) => () => <div>1 {props.children}</div>,
+    component: (props) => () => <div>1 {props.t} | {props.children}</div>,
     name: 'Main'
   },
   {
     path: '/a',
-    component: (props) => () => <div>a {props.children}</div>,
+    component: (props) => () => <div>a {props.t} | {props.children}</div>,
     name: 'Main1'
   }
 ])
