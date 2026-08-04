@@ -29,7 +29,10 @@ export function createView(child: Child): View {
 
   if (isVNode(child)) {
     if (child.type === FRAGMENT) {
-      return new FragmentView(normalizeChildren(child.props.children));
+      return new FragmentView(
+        normalizeChildren(child.props.children),
+        child.key,
+      );
     }
 
     if (typeof child.type === "string") {

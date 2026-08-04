@@ -64,6 +64,12 @@ export class ElementView extends BaseView {
   }
 
   update(next: Child): boolean {
+    // тот же самый узел описания — сверять нечего, всё динамическое живёт
+    // в собственных эффектах пропов и детей
+    if (next === this.vnode) {
+      return true;
+    }
+
     if (
       !isVNode(next) ||
       next.type !== this.vnode.type ||

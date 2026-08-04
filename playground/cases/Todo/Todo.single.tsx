@@ -1,4 +1,4 @@
-import { state, If, For, defineOptions } from "orve";
+import { state, If, For, defineOptions, State } from "orve";
 import { Todo } from "./Todo.js";
 
 const Form = ({ createTodo }: { createTodo: (name: string) => void }) => {
@@ -45,16 +45,18 @@ const List = (props: { list: Todo[], switchStatus: (id: number) => void, deleteT
 
   return () => (
     <section>
-      <For each={() => props.list}>
-        {(todo: Todo) => {
-          const style = `font-weight: ${todo.done ? 'bold' : 'normal'}`;
-
-          return (<div key={todo.id} style={style}>
-            {todo.name} <input type="checkbox" checked={todo.done} onChange={() => props.switchStatus(todo.id)} />
-            <button onClick={() => props.deleteTodo(todo.id)}>х</button>
+      <For each={() => props.list} by={(todo: Todo) => todo.id}>
+        {(todo: State<Todo>) => (
+          <div style={() => `font-weight: ${todo.value.done ? 'bold' : 'normal'}`}>
+            {() => todo.value.name}{' '}
+            <input
+              type="checkbox"
+              checked={() => todo.value.done}
+              onChange={() => props.switchStatus(todo.peek().id)}
+            />
+            <button onClick={() => props.deleteTodo(todo.peek().id)}>х</button>
           </div>
-          )
-        }}
+        )}
       </For>
     </section>
   )

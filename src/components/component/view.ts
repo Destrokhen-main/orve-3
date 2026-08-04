@@ -110,6 +110,11 @@ export class ComponentView extends BaseView {
   }
 
   update(next: Child): boolean {
+    // тот же самый узел описания — пропсы не менялись
+    if (next === this.vnode) {
+      return true;
+    }
+
     if (!isVNode(next) || next.type !== this.fn || next.key !== this.key) {
       return false;
     }

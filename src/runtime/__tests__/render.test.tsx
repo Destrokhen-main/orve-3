@@ -1,6 +1,6 @@
 import { defineOptions } from "../../index.js";
 import { For, If } from "../../components/component-orve/index.js";
-import { computed, nextTick, state } from "../../core/reactive/index.js";
+import { State, computed, nextTick, state } from "../../core/reactive/index.js";
 import { createInstance } from "../../instance/index.js";
 import { ComponentFn } from "../types.js";
 
@@ -282,7 +282,7 @@ describe("рендер", () => {
         return () => (
           <ul>
             <For each={() => items.value}>
-              {(item: string, index: number) => <li key={index}>{item}</li>}
+              {(item: State<string>) => <li>{() => item.value}</li>}
             </For>
           </ul>
         );
@@ -303,7 +303,7 @@ describe("рендер", () => {
         return () => (
           <ul>
             <For each={items}>
-              {(item: string, index: number) => <li key={index}>{item}</li>}
+              {(item: State<string>) => <li>{() => item.value}</li>}
             </For>
           </ul>
         );
@@ -319,6 +319,166 @@ describe("рендер", () => {
 
       expect([...view.app.querySelectorAll("li")].map((li) => li.textContent)).toStrictEqual(
         ["a", "b", "c"],
+      );
+    });
+
+    it("колбэк строки вызывается один раз за её жизнь", async () => {
+      const row = jest.fn();
+      const items = state(["a"]);
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <ul>
+            <For each={items}>
+              {(item: State<string>) => {
+                row();
+                return <li>{() => item.value}</li>;
+              }}
+            </For>
+          </ul>
+        );
+      };
+
+      mount(App);
+      expect(row).toHaveBeenCalledTimes(1);
+
+      items.set((list) => [...list, "b"]);
+      await nextTick();
+      // пересобирается только новая строка, прежняя не трогается
+      expect(row).toHaveBeenCalledTimes(2);
+
+      items.set((list) => [...list, "c"]);
+      await nextTick();
+      expect(row).toHaveBeenCalledTimes(3);
+    });
+
+    it("с key строка переживает замену объекта", async () => {
+      type Todo = { id: number; name: string };
+      const row = jest.fn();
+      const items = state<Todo[]>([
+        { id: 1, name: "a" },
+        { id: 2, name: "b" },
+      ]);
+
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <ul>
+            <For each={items} by={(todo: Todo) => todo.id}>
+              {(todo: State<Todo>) => {
+                row();
+                return <li>{() => todo.value.name}</li>;
+              }}
+            </For>
+          </ul>
+        );
+      };
+
+      const view = mount(App);
+      const first = view.app.querySelector("li")!;
+      expect(row).toHaveBeenCalledTimes(2);
+
+      items.set((list) =>
+        list.map((todo) => (todo.id === 1 ? { ...todo, name: "A" } : todo)),
+      );
+      await nextTick();
+
+      expect([...view.app.querySelectorAll("li")].map((li) => li.textContent)).toStrictEqual(
+        ["A", "b"],
+      );
+      // тот же самый DOM-узел и ни одного нового вызова колбэка
+      expect(view.app.querySelector("li")).toBe(first);
+      expect(row).toHaveBeenCalledTimes(2);
+    });
+
+    it("перестановка двигает узлы, а не пересоздаёт их", async () => {
+      type Todo = { id: number; name: string };
+      const row = jest.fn();
+      const items = state<Todo[]>([
+        { id: 1, name: "a" },
+        { id: 2, name: "b" },
+      ]);
+
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <ul>
+            <For each={items} by={(todo: Todo) => todo.id}>
+              {(todo: State<Todo>, index: State<number>) => {
+                row();
+                return (
+                  <li>
+                    {() => index.value}:{() => todo.value.name}
+                  </li>
+                );
+              }}
+            </For>
+          </ul>
+        );
+      };
+
+      const view = mount(App);
+      const [a, b] = [...view.app.querySelectorAll("li")];
+      expect([a.textContent, b.textContent]).toStrictEqual(["0:a", "1:b"]);
+
+      items.set((list) => [...list].reverse());
+      await nextTick();
+
+      const after = [...view.app.querySelectorAll("li")];
+      expect(after).toStrictEqual([b, a]);
+      expect(after.map((li) => li.textContent)).toStrictEqual(["0:b", "1:a"]);
+      expect(row).toHaveBeenCalledTimes(2);
+    });
+
+    it("без key иммутабельная замена пересоздаёт строку", async () => {
+      type Todo = { id: number; name: string };
+      const row = jest.fn();
+      const items = state<Todo[]>([{ id: 1, name: "a" }]);
+
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <ul>
+            <For each={items}>
+              {(todo: State<Todo>) => {
+                row();
+                return <li>{() => todo.value.name}</li>;
+              }}
+            </For>
+          </ul>
+        );
+      };
+
+      const view = mount(App);
+      expect(row).toHaveBeenCalledTimes(1);
+
+      items.set((list) => list.map((todo) => ({ ...todo, name: "A" })));
+      await nextTick();
+
+      expect(view.app.querySelector("li")!.textContent).toBe("A");
+      // сопоставление по ссылке на item — объект новый, строка новая
+      expect(row).toHaveBeenCalledTimes(2);
+    });
+
+    it("удалённая строка размонтируется", async () => {
+      const items = state(["a", "b", "c"]);
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <ul>
+            <For each={items} by={(item: string) => item}>
+              {(item: State<string>) => <li>{() => item.value}</li>}
+            </For>
+          </ul>
+        );
+      };
+
+      const view = mount(App);
+      items.set((list) => list.filter((item) => item !== "b"));
+      await nextTick();
+
+      expect([...view.app.querySelectorAll("li")].map((li) => li.textContent)).toStrictEqual(
+        ["a", "c"],
       );
     });
   });

@@ -1,4 +1,4 @@
-import { state, computed, defineOptions, For, If } from "orve";
+import { state, computed, defineOptions, For, If, State } from "orve";
 
 const Single = () => {
   defineOptions({
@@ -21,7 +21,7 @@ const Single = () => {
 
       <ul>
         <For each={items}>
-          {(item: string, index: number) => <li key={index}>{item}</li>}
+          {(item: State<string>) => <li>{() => item.value}</li>}
         </For>
       </ul>
 

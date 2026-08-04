@@ -1,7 +1,15 @@
-import { defineOptions, For, state } from "orve";
+import { defineOptions, For, State, state } from "orve";
+
+type Item = { name: number; state: string };
 
 function getRandomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+const color = (item: Item) => {
+  if (item.state === 'progress') return 'yellow';
+  if (item.state === 'done') return 'green';
+  return 'unset';
 }
 
 const request = (done: () => void) => {
@@ -38,21 +46,20 @@ export const AsyncCaseSingle = () => {
     }
   }))
 
+  // строка переживает замену объекта по `by`, поэтому обновление одного
+  // элемента не пересобирает остальные 9999
+  const setState = (index: number, next: string) => {
+    array.set((list) => {
+      const copy = [...list];
+      copy[index] = { ...copy[index], state: next };
+      return copy;
+    });
+  }
+
   const start = () => {
     for (let i = 0; i !== array.value.length; i++) {
-      const item = array.value[i];
-      item.state = 'progress';
-
-      const newArray = [...array.value];
-      newArray[i] = item;
-      array.set(newArray);
-
-      request(() => {
-        item.state = 'done';
-        const newArray = [...array.value];
-        newArray[i] = item;
-        array.set(newArray);
-      })
+      setState(i, 'progress');
+      request(() => setState(i, 'done'));
     }
   }
 
@@ -61,17 +68,15 @@ export const AsyncCaseSingle = () => {
       <h1>SINGLE</h1>
       <button onClick={start}>START</button>
       <div style='display: flex; flex-wrap: wrap; border'>
-        <For each={array}>
-          {(item, index) => {
-            let state = 'unset';
-            if (item.state === 'progress') {
-              state = 'yellow';
-            } else if (item.state === 'done') {
-              state = 'green';
-            }
-
-            return <div class="async-item" style={`background-color: ${state}`} key={index}>{item.name}</div>
-          }}
+        <For each={array} by={(item: Item) => item.name}>
+          {(item: State<Item>) => (
+            <div
+              class="async-item"
+              style={() => `background-color: ${color(item.value)}`}
+            >
+              {() => item.value.name}
+            </div>
+          )}
         </For>
       </div>
     </>
@@ -110,16 +115,9 @@ export const AsyncCaseBase = () => {
       <button onClick={start}>START</button>
       <div style='display: flex; flex-wrap: wrap; border'>
         {
-          array.value.map((item, index) => {
-            let state = 'unset';
-            if (item.state === 'progress') {
-              state = 'yellow';
-            } else if (item.state === 'done') {
-              state = 'green';
-            }
-
-            return <div class="async-item" style={`background-color: ${state}`} key={index}>{item.name}</div>
-          })
+          array.value.map((item, index) => (
+            <div class="async-item" style={`background-color: ${color(item)}`} key={index}>{item.name}</div>
+          ))
         }
       </div>
     </>

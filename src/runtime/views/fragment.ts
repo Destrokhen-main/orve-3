@@ -1,9 +1,9 @@
 import { createComment } from "../../utils/helperNode/index.js";
-import { toChildArray } from "../jsx.js";
+import { isVNode, toChildArray } from "../jsx.js";
 import { createView } from "../mount.js";
 import { NS, getNS, withNS } from "../namespace.js";
 import { patchChildren } from "../patch.js";
-import { Child, View } from "../types.js";
+import { Child, FRAGMENT, Key, View } from "../types.js";
 import { BaseView } from "./base.js";
 
 /**
@@ -15,8 +15,12 @@ export class FragmentView extends BaseView {
   private children: View[] = [];
   private readonly ns: NS = getNS();
 
-  constructor(private source: Child[]) {
+  constructor(
+    private source: Child[],
+    key: Key = null,
+  ) {
     super();
+    this.key = key;
   }
 
   mount(parent: Node, anchor: Node | null) {
@@ -35,6 +39,12 @@ export class FragmentView extends BaseView {
   }
 
   update(next: Child): boolean {
+    // помеченный фрагмент обновляется только помеченным тем же ключом
+    const nextKey = isVNode(next) && next.type === FRAGMENT ? next.key : null;
+    if (nextKey !== this.key) {
+      return false;
+    }
+
     const list = toChildArray(next);
     if (!list) {
       return false;
