@@ -25,6 +25,10 @@ const Layout2: ComponentFn = (props) => {
 }
 
 export const Comp: ComponentFn = () => {
+  defineOptions({
+    single: true,
+  })
+
   const a = state(true);
 
   const c = computed(() => {

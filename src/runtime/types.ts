@@ -5,7 +5,7 @@ export const FRAGMENT = Symbol("orve.fragment");
 
 export type Key = string | number | null;
 export type Props = {
-  children ?: Child[];
+  children ?: Child;
   [key: string]: any
 };
 

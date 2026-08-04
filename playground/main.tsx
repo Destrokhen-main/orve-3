@@ -12,9 +12,11 @@ import { Plugin } from "./cases/Plugin/Plugin.js";
 import { Async } from "./cases/Async/Async.js";
 import { store } from "./cases/Plugin/user.js";
 import { Comp } from "./cases/Components/Components.js";
+import { BaseRouter } from "./cases/BaseRouter/BaseRouter.js";
+import { router } from "./cases/BaseRouter/router.js";
 
-const arrayComponent = [Basic, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Plugin, Async, Comp];
-const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Plugin', 'With request', 'Components'];
+const arrayComponent = [Basic, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Plugin, Async, Comp, BaseRouter];
+const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Plugin', 'With request', 'Components', 'BaseRouter'];
 
 const debugPage = null;
 
@@ -43,4 +45,4 @@ const App = () => {
   );
 };
 
-createInstance().use(store).rootComponent(App).mountRoot("#app");
+createInstance().use(store).use(router).rootComponent(App).mountRoot("#app");
