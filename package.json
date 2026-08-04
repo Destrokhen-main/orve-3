@@ -34,7 +34,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest ./src",
     "test:w": "pnpm test --watch",
-    "prepack": "pnpm build"
+    "prepack": "pnpm build",
+    "prepare": "husky"
   },
   "author": "Destrokhen <armagiddon19@gmail.com>",
   "keywords": [
