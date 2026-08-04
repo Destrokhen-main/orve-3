@@ -32,6 +32,12 @@ export type { LifecycleHook } from "./components/component/index.js";
 export { provide, inject } from "./instance/context/provider/index.js";
 export { defineOptions } from "./instance/context/defines/defineOptions.js";
 export { createInstance, OrveInstance } from "./instance/index.js";
+export { usePlugin, usePlugins } from "./instance/plugins/usePlugins.js";
+export type {
+  OrvePluginType,
+  OrvePlugins,
+  PluginContext,
+} from "./instance/plugins/types.js";
 export { Component, For, If } from "./components/component-orve/index.js";
 export type {
   ComponentProps,

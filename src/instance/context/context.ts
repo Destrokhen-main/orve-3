@@ -4,15 +4,21 @@ export type ContextType = {
   provide: Record<string | symbol, unknown>;
   options: ComponentOptions;
   parent: ContextType | null;
+  plugins: Record<string, unknown>;
 };
 
 const stack: ContextType[] = [];
 
-export function createContext(parent: ContextType | null): ContextType {
+export function createContext(
+  parent: ContextType | null,
+  plugins?: Record<string, unknown>,
+): ContextType {
   return {
     provide: {},
     options: {} as ComponentOptions,
     parent,
+    // плагины задаются один раз на корне инстанса и наследуются вниз по цепочке
+    plugins: plugins ?? parent?.plugins ?? {},
   };
 }
 

@@ -1,3 +1,5 @@
+import { PluginContext } from "./plugins/types.js";
+
 export type OrveInstanceType = {
-  plugins: Record<string, unknown>
-}
+  plugins: PluginContext;
+};

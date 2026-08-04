@@ -10,7 +10,7 @@ import { Todo } from "./cases/Todo/Todo.js";
 import { ProvideInject } from "./cases/ProvideInject/ProvideInject.js";
 import { Store } from "./cases/Store/Store.js";
 import { Async } from "./cases/Async/Async.js";
-import { useStore } from "./cases/Store/user.js";
+import { store } from "./cases/Store/user.js";
 
 const arrayComponent = [Basic, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Store, Async];
 const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Store', 'With request'];
@@ -21,9 +21,6 @@ const App = () => {
   defineOptions({
     single: true,
   })
-
-  // инициализация, для кейса
-  useStore();
 
   const page = state(debugPage ?? arrayComponent.length);
 
@@ -45,4 +42,4 @@ const App = () => {
   );
 };
 
-createInstance().rootComponent(App).mountRoot("#app");
+createInstance().use(store).rootComponent(App).mountRoot("#app");

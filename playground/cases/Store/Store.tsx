@@ -1,8 +1,8 @@
-import { defineOptions, onUnmounted } from "orve";
-import { resetStore, useStore } from "./user.js";
+import { defineOptions, onUnmounted, usePlugin, usePlugins } from "orve";
+import { UseStore } from "./user";
 
 const ComponentBase = () => {
-  const store = useStore();
+  const store = usePlugin('store') as UseStore;
 
   return () => (
     <div>
@@ -18,7 +18,7 @@ const ComponentSingle = () => {
     single: true,
   })
 
-  const store = useStore();
+  const store = usePlugin('store') as UseStore;
 
   return () => (
     <div>
@@ -30,7 +30,9 @@ const ComponentSingle = () => {
 }
 
 export const Store = () => {
-  const store = useStore();
+  const store = usePlugin('store') as UseStore;
+
+  console.log(usePlugins());
 
   return () => (
     <section>

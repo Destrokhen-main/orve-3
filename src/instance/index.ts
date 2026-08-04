@@ -2,6 +2,7 @@ import { EffectScope, effectScope } from "../core/reactive/index.js";
 import { jsx } from "../runtime/jsx.js";
 import { createView } from "../runtime/mount.js";
 import { ComponentFn, View } from "../runtime/types.js";
+import { createContext, withContext } from "./context/context.js";
 import { OrvePlugin } from "./plugins/plugins.js";
 import { OrvePluginType } from "./plugins/types.js";
 import { OrveInstanceType } from "./types.js";
@@ -47,11 +48,17 @@ export class OrveInstance {
       );
     }
 
+    // корневой контекст инстанса: держит плагины, дальше они наследуются
+    // всеми контекстами компонентов вниз по дереву
+    const rootCtx = createContext(null, this.instance.plugins);
+
     // корневая область: unmount() гасит всё дерево эффектов разом
     this.scope = effectScope(true);
     this.scope.run(() => {
-      this.view = createView(jsx(this.root!, {}));
-      this.view.mount(target, null);
+      withContext(rootCtx, () => {
+        this.view = createView(jsx(this.root!, {}));
+        this.view.mount(target, null);
+      });
     });
 
     return this;

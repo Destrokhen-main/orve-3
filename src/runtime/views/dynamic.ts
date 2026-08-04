@@ -5,6 +5,11 @@ import {
   onScopeDispose,
   untrack,
 } from "../../core/reactive/index.js";
+import {
+  ContextType,
+  getCurrentContext,
+  withContext,
+} from "../../instance/context/index.js";
 import { createComment } from "../../utils/helperNode/index.js";
 import { readSlot } from "../jsx.js";
 import { createView } from "../mount.js";
@@ -23,6 +28,13 @@ export class DynamicView extends BaseView {
   /** Область текущего поддерева: отсоединённая, чтобы не копиться в родителе. */
   private childScope: EffectScope | null = null;
   private readonly ns: NS = getNS();
+  /**
+   * Контекст места, где слот был создан. Эффект слота перезапускается
+   * асинхронно — к этому моменту стек контекстов уже пуст, а внутри apply
+   * монтируются компоненты, и их setup должен видеть ту же цепочку
+   * провайдеров и плагинов, что и при первом монтировании.
+   */
+  private readonly ctx: ContextType | null = getCurrentContext();
 
   constructor(private source: Slot) {
     super();
@@ -64,21 +76,28 @@ export class DynamicView extends BaseView {
   }
 
   private apply(value: Child) {
-    if (this.current && this.childScope) {
-      const updated = this.childScope.run(() => this.current!.update(value));
-      if (updated) {
-        return;
+    this.withCtx(() => {
+      if (this.current && this.childScope) {
+        const updated = this.childScope.run(() => this.current!.update(value));
+        if (updated) {
+          return;
+        }
+        this.disposeCurrent();
       }
-      this.disposeCurrent();
-    }
 
-    this.childScope = effectScope(true);
-    this.childScope.run(() => {
-      withNS(this.ns, () => {
-        this.current = createView(value);
-        this.current!.mount(this.parentNode!, this.anchor);
+      this.childScope = effectScope(true);
+      this.childScope.run(() => {
+        withNS(this.ns, () => {
+          this.current = createView(value);
+          this.current!.mount(this.parentNode!, this.anchor);
+        });
       });
     });
+  }
+
+  /** Восстанавливает контекст создания слота на время работы с поддеревом. */
+  private withCtx<T>(fn: () => T): T {
+    return this.ctx ? withContext(this.ctx, fn) : fn();
   }
 
   private disposeCurrent() {
