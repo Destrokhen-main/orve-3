@@ -29,7 +29,7 @@ const ComponentSingle = () => {
   )
 }
 
-export const Store = () => {
+export const Plugin = () => {
   const store = usePlugin('store') as UseStore;
 
   return () => (
