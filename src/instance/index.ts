@@ -42,7 +42,9 @@ export class OrveInstance {
     }
 
     if (!this.root) {
-      throw new Error("[orve] Корневой компонент не задан: вызовите rootComponent()");
+      throw new Error(
+        "[orve] Корневой компонент не задан: вызовите rootComponent()",
+      );
     }
 
     // корневая область: unmount() гасит всё дерево эффектов разом

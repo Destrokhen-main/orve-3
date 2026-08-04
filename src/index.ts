@@ -31,6 +31,7 @@ export {
   single,
 } from "./components/component";
 export type { LifecycleHook } from "./components/component";
+export { provide, inject } from "./instance/context/provider";
 export { createInstance, OrveInstance } from "./instance";
 export { Component, For, If } from "./components/component-orve";
 export type {
@@ -40,6 +41,7 @@ export type {
 
 export { Fragment, jsx, jsxs } from "./runtime/jsx";
 export { createView, mountChild } from "./runtime/mount";
+
 export type {
   Child,
   ComponentFn,
