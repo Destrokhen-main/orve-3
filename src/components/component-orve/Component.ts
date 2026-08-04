@@ -1,5 +1,6 @@
 import { defineOptions } from "../..";
 import type { Computed, State } from "../../core/reactive";
+import { getCurrentContext } from "../../instance/context";
 import { isVNode, jsx } from "../../runtime/jsx";
 import { ComponentFn, Props, VNode } from "../../runtime/types";
 
@@ -60,6 +61,12 @@ function forward(props: Props): Props {
  * узел: `computed`, возвращающий `<Card />`, кладётся в `is` как есть.
  */
 const Dynamic = (props: ComponentProps) => {
+  const ctx = getCurrentContext();
+
+  if (!ctx?.parent?.options.single) {
+    console.warn("[orve] - Использование Component в base комопнентах.");
+  }
+
   defineOptions({
     single: true,
   });

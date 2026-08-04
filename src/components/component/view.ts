@@ -78,6 +78,10 @@ export class ComponentView extends BaseView {
           popContext();
         }
 
+        if (typeof this.render !== "function") {
+          throw new Error("[orve] - Рендер не вернул никакой функции!");
+        }
+
         if (this.ctx?.options.single) {
           // Сингл: render вызывается один раз, контекст нужен для дочерних setup
           withContext(this.ctx!, () => this.applyTree(untrack(this.render!)));

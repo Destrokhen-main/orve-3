@@ -1,4 +1,5 @@
 import { defineOptions } from "../..";
+import { getCurrentContext } from "../../instance/context";
 import { resolve } from "../../runtime/jsx";
 import { Child, MaybeReactive } from "../../runtime/types";
 
@@ -14,6 +15,12 @@ export type ForProps<T = any> = {
  * переиспользуются, а не пересоздаются.
  */
 export const For = <T>(props: ForProps<T>) => {
+  const ctx = getCurrentContext();
+
+  if (!ctx?.parent?.options.single) {
+    console.warn("[orve] - Использование For в base комопнентах.");
+  }
+
   defineOptions({
     single: true,
   });

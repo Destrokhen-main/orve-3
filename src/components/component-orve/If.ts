@@ -1,4 +1,5 @@
 import { defineOptions } from "../..";
+import { getCurrentContext } from "../../instance/context";
 import { resolve } from "../../runtime/jsx";
 import { Child, MaybeReactive } from "../../runtime/types";
 
@@ -17,6 +18,12 @@ export type IfProps = {
  * пересобирается только это поддерево.
  */
 export const If = (props: IfProps) => {
+  const ctx = getCurrentContext();
+
+  if (!ctx?.parent?.options.single) {
+    console.warn("[orve] - Использование If в base комопнентах.");
+  }
+
   defineOptions({
     single: true,
   });

@@ -3,9 +3,9 @@ import { defineOptions, state } from "orve"
 export const SingleComp = () => {
   const num = state(0);
 
-  // defineOptions({
-  //   single: true,
-  // });
+  defineOptions({
+    single: true,
+  });
 
   return () => (
     <div>
