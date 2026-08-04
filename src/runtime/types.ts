@@ -4,13 +4,16 @@ import type { State } from "../core/reactive/state/index.js";
 export const FRAGMENT = Symbol("orve.fragment");
 
 export type Key = string | number | null;
-export type Props = Record<string, any>;
+export type Props = {
+  children ?: Child[];
+  [key: string]: any
+};
 
 /** Функция, которую компонент возвращает из setup. */
 export type Render = () => Child;
 
 /** Компонент: setup вызывается один раз и возвращает render. */
-export type ComponentFn<P extends Props = any> = (props: P) => Render;
+export type ComponentFn<P extends Props = Props> = (props: P) => Render;
 
 export type VNode = {
   readonly __orve: true;
