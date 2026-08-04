@@ -1,5 +1,5 @@
 import { state, If, For, defineOptions } from "orve";
-import { Todo } from "./Todo";
+import { Todo } from "./Todo.js";
 
 const Form = ({ createTodo }: { createTodo: (name: string) => void }) => {
   defineOptions({

@@ -1,4 +1,4 @@
-import { effect, untrack } from "../../core/reactive";
+import { effect, untrack } from "../../core/reactive/index.js";
 import {
   ContextType,
   createContext,
@@ -6,14 +6,14 @@ import {
   popContext,
   pushContext,
   withContext,
-} from "../../instance/context/context";
-import { isVNode } from "../../runtime/jsx";
-import { createView } from "../../runtime/mount";
-import { NS, getNS, withNS } from "../../runtime/namespace";
-import { patch } from "../../runtime/patch";
-import { Child, ComponentFn, Render, View, VNode } from "../../runtime/types";
-import { BaseView } from "../../runtime/views/base";
-import { createComment } from "../../utils/helperNode";
+} from "../../instance/context/context.js";
+import { isVNode } from "../../runtime/jsx.js";
+import { createView } from "../../runtime/mount.js";
+import { NS, getNS, withNS } from "../../runtime/namespace.js";
+import { patch } from "../../runtime/patch.js";
+import { Child, ComponentFn, Render, View, VNode } from "../../runtime/types.js";
+import { BaseView } from "../../runtime/views/base.js";
+import { createComment } from "../../utils/helperNode/index.js";
 import {
   Hooks,
   beginMount,
@@ -22,8 +22,8 @@ import {
   popHooks,
   pushHooks,
   runHooks,
-} from "./lifecycle";
-import { ReactiveProps } from "./props";
+} from "./lifecycle.js";
+import { ReactiveProps } from "./props.js";
 
 /**
  * Экземпляр компонента. setup выполняется один раз внутри собственной

@@ -1,6 +1,6 @@
-import { Job, scheduler } from "./scheduler";
-import { getCurrentScope, Stoppable } from "./scope";
-import { popEffect, pushEffect } from "./stack";
+import { Job, scheduler } from "./scheduler.js";
+import { getCurrentScope, Stoppable } from "./scope.js";
+import { popEffect, pushEffect } from "./stack.js";
 
 export type EffectOptions = {
   /**

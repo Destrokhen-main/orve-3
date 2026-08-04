@@ -1,6 +1,6 @@
-import { computed } from "../computed";
-import { nextTick } from "../core";
-import { state } from "../state";
+import { computed } from "../computed/index.js";
+import { nextTick } from "../core/index.js";
+import { state } from "../state/index.js";
 
 describe("reactive - object", () => {
   it("should call trigger object", async () => {

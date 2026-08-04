@@ -1,5 +1,5 @@
-import { createInstance, OrveInstance } from '../';
-import { OrvePlugin } from '../plugins/plugins';
+import { createInstance, OrveInstance } from '../index.js';
+import { OrvePlugin } from '../plugins/plugins.js';
 
 describe('plugin', () => {
   let instance: OrveInstance

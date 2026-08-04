@@ -1,8 +1,8 @@
-import { defineOptions } from "../..";
-import type { Computed, State } from "../../core/reactive";
-import { getCurrentContext } from "../../instance/context";
-import { isVNode, jsx } from "../../runtime/jsx";
-import { ComponentFn, Props, VNode } from "../../runtime/types";
+import { defineOptions } from "../../index.js";
+import type { Computed, State } from "../../core/reactive/index.js";
+import { getCurrentContext } from "../../instance/context/index.js";
+import { isVNode, jsx } from "../../runtime/jsx.js";
+import { ComponentFn, Props, VNode } from "../../runtime/types.js";
 
 /**
  * Что рендерить: компонент, имя тега, уже готовый JSX-узел или ничего.

@@ -1,6 +1,6 @@
-import { isVNode } from "./jsx";
-import { createView } from "./mount";
-import { Child, Key, View } from "./types";
+import { isVNode } from "./jsx.js";
+import { createView } from "./mount.js";
+import { Child, Key, View } from "./types.js";
 
 /**
  * Обновить представление или заменить его. Один и тот же реконсилятор

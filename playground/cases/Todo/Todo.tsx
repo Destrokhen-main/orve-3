@@ -1,6 +1,6 @@
 import { defineOptions } from "orve";
-import { TodoBasic } from "./Todo.base";
-import { TodoSingle } from "./Todo.single";
+import { TodoBasic } from "./Todo.base.js";
+import { TodoSingle } from "./Todo.single.js";
 
 export type Todo = {
   id: number;

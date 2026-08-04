@@ -1,10 +1,10 @@
-import { EffectScope, effectScope } from "../core/reactive";
-import { jsx } from "../runtime/jsx";
-import { createView } from "../runtime/mount";
-import { ComponentFn, View } from "../runtime/types";
-import { OrvePlugin } from "./plugins/plugins";
-import { OrvePluginType } from "./plugins/types";
-import { OrveInstanceType } from "./types";
+import { EffectScope, effectScope } from "../core/reactive/index.js";
+import { jsx } from "../runtime/jsx.js";
+import { createView } from "../runtime/mount.js";
+import { ComponentFn, View } from "../runtime/types.js";
+import { OrvePlugin } from "./plugins/plugins.js";
+import { OrvePluginType } from "./plugins/types.js";
+import { OrveInstanceType } from "./types.js";
 
 export class OrveInstance {
   private instance: OrveInstanceType = {

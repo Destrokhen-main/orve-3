@@ -1,7 +1,7 @@
-import { nextTick, state } from "../../core/reactive";
-import { createInstance } from "../../instance";
-import { defineOptions } from "../../instance/context/defines/defineOptions";
-import { ComponentFn } from "../types";
+import { nextTick, state } from "../../core/reactive/index.js";
+import { createInstance } from "../../instance/index.js";
+import { defineOptions } from "../../instance/context/defines/defineOptions.js";
+import { ComponentFn } from "../types.js";
 
 function mount(Component: ComponentFn<any>) {
   document.body.innerHTML = '<div id="app"></div>';

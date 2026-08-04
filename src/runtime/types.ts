@@ -1,5 +1,5 @@
-import type { Computed } from "../core/reactive/computed";
-import type { State } from "../core/reactive/state";
+import type { Computed } from "../core/reactive/computed/index.js";
+import type { State } from "../core/reactive/state/index.js";
 
 export const FRAGMENT = Symbol("orve.fragment");
 

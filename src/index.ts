@@ -14,32 +14,32 @@ export {
   state,
   untrack,
   watch,
-} from "./core/reactive";
+} from "./core/reactive/index.js";
 export type {
   ComputedOptions,
   EffectOptions,
   OptionsWatch,
   Reactive,
   StateOptions,
-} from "./core/reactive";
+} from "./core/reactive/index.js";
 
 export {
   onBeforeUnmounted,
   onMounted,
   onUnmounted,
-} from "./components/component";
-export type { LifecycleHook } from "./components/component";
-export { provide, inject } from "./instance/context/provider";
-export { defineOptions } from "./instance/context/defines/defineOptions";
-export { createInstance, OrveInstance } from "./instance";
-export { Component, For, If } from "./components/component-orve";
+} from "./components/component/index.js";
+export type { LifecycleHook } from "./components/component/index.js";
+export { provide, inject } from "./instance/context/provider/index.js";
+export { defineOptions } from "./instance/context/defines/defineOptions.js";
+export { createInstance, OrveInstance } from "./instance/index.js";
+export { Component, For, If } from "./components/component-orve/index.js";
 export type {
   ComponentProps,
   DynamicTarget,
-} from "./components/component-orve/Component";
+} from "./components/component-orve/Component.js";
 
-export { Fragment, jsx, jsxs } from "./runtime/jsx";
-export { createView, mountChild } from "./runtime/mount";
+export { Fragment, jsx, jsxs } from "./runtime/jsx.js";
+export { createView, mountChild } from "./runtime/mount.js";
 
 export type {
   Child,
@@ -49,4 +49,13 @@ export type {
   Render,
   View,
   VNode,
-} from "./runtime/types";
+} from "./runtime/types.js";
+
+export type {
+  CSSProperties,
+  ClassValue,
+  ElementRef,
+  EventHandler,
+  EventProp,
+  IntrinsicProps,
+} from "./runtime/jsx-attributes.js";

@@ -1,6 +1,6 @@
-import { computed } from "../computed";
-import { nextTick, setEffectOnces } from "../core";
-import { state } from "../state";
+import { computed } from "../computed/index.js";
+import { nextTick, setEffectOnces } from "../core/index.js";
+import { state } from "../state/index.js";
 
 describe("reactive", () => {
   describe("basic reactive [primitive]", () => {

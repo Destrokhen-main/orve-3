@@ -1,9 +1,9 @@
-export { State, state } from "./state";
-export type { StateOptions } from "./state/types";
-export { Computed, computed } from "./computed";
-export type { ComputedOptions } from "./computed/types";
-export { watch } from "./watch";
-export type { CallbackWatch, OptionsWatch } from "./watch/types";
+export { State, state } from "./state/index.js";
+export type { StateOptions } from "./state/types.js";
+export { Computed, computed } from "./computed/index.js";
+export type { ComputedOptions } from "./computed/types.js";
+export { watch } from "./watch/index.js";
+export type { CallbackWatch, OptionsWatch } from "./watch/types.js";
 
 export {
   Effect,
@@ -16,5 +16,5 @@ export {
   nextTick,
   onScopeDispose,
   untrack,
-} from "./core";
-export type { EffectOptions, Reactive } from "./core";
+} from "./core/index.js";
+export type { EffectOptions, Reactive } from "./core/index.js";

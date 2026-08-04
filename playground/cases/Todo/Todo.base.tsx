@@ -1,5 +1,5 @@
 import { state } from "orve";
-import { Todo } from "./Todo";
+import { Todo } from "./Todo.js";
 
 const Form = ({ createTodo }: { createTodo: (name: string) => void }) => {
   const errorMessage = state<string | null>(null);

@@ -1,6 +1,6 @@
-import { nextTick } from "../core";
-import { state } from "../state"
-import { watch } from "../watch"
+import { nextTick } from "../core/index.js";
+import { state } from "../state/index.js"
+import { watch } from "../watch/index.js"
 
 describe('watch', () => {
   it('should called watch', () => {

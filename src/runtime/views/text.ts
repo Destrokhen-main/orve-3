@@ -1,7 +1,7 @@
-import { createText, setText } from "../../utils/helperNode";
-import { isPrimitiveChild, toText } from "../jsx";
-import { Child } from "../types";
-import { BaseView } from "./base";
+import { createText, setText } from "../../utils/helperNode/index.js";
+import { isPrimitiveChild, toText } from "../jsx.js";
+import { Child } from "../types.js";
+import { BaseView } from "./base.js";
 
 export class TextView extends BaseView {
   private node: Text | null = null;

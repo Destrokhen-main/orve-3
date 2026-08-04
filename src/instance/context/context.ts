@@ -1,4 +1,4 @@
-import { ComponentOptions } from "./defines/types";
+import { ComponentOptions } from "./defines/types.js";
 
 export type ContextType = {
   provide: Record<string | symbol, unknown>;

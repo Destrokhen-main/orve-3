@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(npx tsc *)",
-      "Bash(npx jest *)"
+      "Bash(npx jest *)",
+      "Bash(pnpm typecheck *)",
+      "Bash(pnpm test *)",
+      "Bash(npx eslint *)",
+      "Bash(npx prettier *)",
+      "Bash(pnpm build *)",
+      "Bash(pnpm dev:build)",
     ]
   }
 }

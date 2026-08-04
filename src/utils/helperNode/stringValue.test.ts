@@ -1,4 +1,4 @@
-import { stringValue } from "./stringValue";
+import { stringValue } from "./stringValue.js";
 
 describe("StringValue", () => {
   it("number", () => {

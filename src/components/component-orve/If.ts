@@ -1,7 +1,7 @@
-import { defineOptions } from "../..";
-import { getCurrentContext } from "../../instance/context";
-import { resolve } from "../../runtime/jsx";
-import { Child, MaybeReactive } from "../../runtime/types";
+import { defineOptions } from "../../index.js";
+import { getCurrentContext } from "../../instance/context/index.js";
+import { resolve } from "../../runtime/jsx.js";
+import { Child, MaybeReactive } from "../../runtime/types.js";
 
 export type IfProps = {
   /** Значение, сигнал или тонк — разворачиваются все три варианта. */

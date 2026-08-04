@@ -1,4 +1,4 @@
-export { onBeforeUnmounted, onMounted, onUnmounted } from "./lifecycle";
-export type { LifecycleHook } from "./lifecycle";
-export { ReactiveProps } from "./props";
-export { ComponentView } from "./view";
+export { onBeforeUnmounted, onMounted, onUnmounted } from "./lifecycle.js";
+export type { LifecycleHook } from "./lifecycle.js";
+export { ReactiveProps } from "./props.js";
+export { ComponentView } from "./view.js";

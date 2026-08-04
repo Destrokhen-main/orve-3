@@ -1,6 +1,6 @@
-import { Computed, State, state } from "../../core/reactive";
-import { isSignal } from "../../runtime/jsx";
-import { Props } from "../../runtime/types";
+import { Computed, State, state } from "../../core/reactive/index.js";
+import { isSignal } from "../../runtime/jsx.js";
+import { Props } from "../../runtime/types.js";
 
 /**
  * Пропсы компонента — объект с геттерами поверх реактивных ячеек.

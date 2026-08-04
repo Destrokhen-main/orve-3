@@ -1,6 +1,7 @@
-import type { ComponentFn, Key, MaybeReactive, VNode } from "./runtime/types";
+import type { IntrinsicElementsMap } from "./runtime/jsx-attributes.js";
+import type { ComponentFn, Key, MaybeReactive, VNode } from "./runtime/types.js";
 
-export { Fragment, jsx, jsxDEV, jsxs } from "./runtime/jsx";
+export { Fragment, jsx, jsxDEV, jsxs } from "./runtime/jsx.js";
 
 export namespace JSX {
   export type Element = VNode;
@@ -24,8 +25,9 @@ export namespace JSX {
     [K in keyof P]: MaybeReactive<P[K]>;
   };
 
-  // TODO: расписать теги поимённо; пока атрибуты не типизируются
-  export interface IntrinsicElements {
-    [tag: string]: any;
-  }
+  /**
+   * Атрибуты выводятся из `lib.dom` (см. `runtime/jsx-attributes`): имена и
+   * события совпадают с тем, что разбирает рантайм.
+   */
+  export type IntrinsicElements = IntrinsicElementsMap;
 }

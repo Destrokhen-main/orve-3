@@ -1,4 +1,4 @@
-import type { Reactive } from "../core/types";
+import type { Reactive } from "../core/types.js";
 
 export type ComputedOptions = {
   /**

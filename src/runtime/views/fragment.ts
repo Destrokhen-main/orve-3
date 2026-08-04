@@ -1,10 +1,10 @@
-import { createComment } from "../../utils/helperNode";
-import { toChildArray } from "../jsx";
-import { createView } from "../mount";
-import { NS, getNS, withNS } from "../namespace";
-import { patchChildren } from "../patch";
-import { Child, View } from "../types";
-import { BaseView } from "./base";
+import { createComment } from "../../utils/helperNode/index.js";
+import { toChildArray } from "../jsx.js";
+import { createView } from "../mount.js";
+import { NS, getNS, withNS } from "../namespace.js";
+import { patchChildren } from "../patch.js";
+import { Child, View } from "../types.js";
+import { BaseView } from "./base.js";
 
 /**
  * Несколько узлов на одном уровне. Держит замыкающий комментарий-якорь:

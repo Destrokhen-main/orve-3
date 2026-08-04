@@ -1,8 +1,8 @@
-import { defineOptions } from "../..";
-import { Component } from "../../components/component-orve";
-import { computed, nextTick, state } from "../../core/reactive";
-import { createInstance } from "../../instance";
-import { ComponentFn } from "../types";
+import { defineOptions } from "../../index.js";
+import { Component } from "../../components/component-orve/index.js";
+import { computed, nextTick, state } from "../../core/reactive/index.js";
+import { createInstance } from "../../instance/index.js";
+import { Child, ComponentFn } from "../types.js";
 
 function mount(App: ComponentFn<any>) {
   document.body.innerHTML = '<div id="app"></div>';
@@ -127,7 +127,7 @@ describe("Component", () => {
   });
 
   it("прокидывает детей", () => {
-    const Frame = (props: { children: unknown }) => () => (
+    const Frame = (props: { children: Child }) => () => (
       <section>{props.children}</section>
     );
     const App = () => () => (

@@ -1,8 +1,8 @@
-import { defineOptions } from "../..";
-import { For, If } from "../../components/component-orve";
-import { computed, nextTick, state } from "../../core/reactive";
-import { createInstance } from "../../instance";
-import { ComponentFn } from "../types";
+import { defineOptions } from "../../index.js";
+import { For, If } from "../../components/component-orve/index.js";
+import { computed, nextTick, state } from "../../core/reactive/index.js";
+import { createInstance } from "../../instance/index.js";
+import { ComponentFn } from "../types.js";
 
 function mount(Component: ComponentFn<any>) {
   document.body.innerHTML = '<div id="app"></div>';

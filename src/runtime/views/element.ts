@@ -1,4 +1,4 @@
-import { Effect, effect, untrack } from "../../core/reactive";
+import { Effect, effect, untrack } from "../../core/reactive/index.js";
 import {
   EventValue,
   addListener,
@@ -8,13 +8,13 @@ import {
   isEventProp,
   isInternalProp,
   removeListener,
-} from "../dom";
-import { isSlot, isVNode, normalizeChildren, readSlot } from "../jsx";
-import { createView } from "../mount";
-import { NS, childNS, elementNS, getNS, withNS } from "../namespace";
-import { patchChildren } from "../patch";
-import { Child, Props, Slot, View, VNode } from "../types";
-import { BaseView } from "./base";
+} from "../dom.js";
+import { isSlot, isVNode, normalizeChildren, readSlot } from "../jsx.js";
+import { createView } from "../mount.js";
+import { NS, childNS, elementNS, getNS, withNS } from "../namespace.js";
+import { patchChildren } from "../patch.js";
+import { Child, Props, Slot, View, VNode } from "../types.js";
+import { BaseView } from "./base.js";
 
 type Binding = { source: Slot; effect: Effect<void>; prev: unknown };
 

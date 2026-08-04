@@ -1,4 +1,4 @@
-import { computed } from "../computed";
+import { computed } from "../computed/index.js";
 import {
   effect,
   effectScope,
@@ -6,9 +6,9 @@ import {
   nextTick,
   onScopeDispose,
   untrack,
-} from "../core";
-import { state } from "../state";
-import { watch } from "../watch";
+} from "../core/index.js";
+import { state } from "../state/index.js";
+import { watch } from "../watch/index.js";
 
 describe("core", () => {
   describe("стек эффектов", () => {

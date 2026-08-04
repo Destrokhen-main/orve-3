@@ -4,13 +4,13 @@ import {
   effectScope,
   onScopeDispose,
   untrack,
-} from "../../core/reactive";
-import { createComment } from "../../utils/helperNode";
-import { readSlot } from "../jsx";
-import { createView } from "../mount";
-import { NS, getNS, withNS } from "../namespace";
-import { Child, Slot, View } from "../types";
-import { BaseView } from "./base";
+} from "../../core/reactive/index.js";
+import { createComment } from "../../utils/helperNode/index.js";
+import { readSlot } from "../jsx.js";
+import { createView } from "../mount.js";
+import { NS, getNS, withNS } from "../namespace.js";
+import { Child, Slot, View } from "../types.js";
+import { BaseView } from "./base.js";
 
 /**
  * Реактивный слот — единственное место, где живёт точечное обновление.

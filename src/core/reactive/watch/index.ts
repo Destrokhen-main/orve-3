@@ -1,6 +1,6 @@
-import { Effect, untrack } from "../core";
-import { Reactive } from "../core/types";
-import { CallbackWatch, OptionsWatch } from "./types";
+import { Effect, untrack } from "../core/index.js";
+import { Reactive } from "../core/types.js";
+import { CallbackWatch, OptionsWatch } from "./types.js";
 
 class Watch {
   private effect: Effect<unknown[]>;

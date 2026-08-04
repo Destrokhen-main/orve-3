@@ -1,6 +1,6 @@
-import { Computed } from "../../core/reactive/computed";
-import { State } from "../../core/reactive/state";
-import { getType } from "../../core/utlils";
+import { Computed } from "../../core/reactive/computed/index.js";
+import { State } from "../../core/reactive/state/index.js";
+import { getType } from "../../core/utlils/index.js";
 
 const PRIMITIVE = ["string", "number", "boolean"];
 

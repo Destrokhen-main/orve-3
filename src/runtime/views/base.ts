@@ -1,5 +1,5 @@
-import { EffectScope, effectScope } from "../../core/reactive";
-import { Child, Key, View } from "../types";
+import { EffectScope, effectScope } from "../../core/reactive/index.js";
+import { Child, Key, View } from "../types.js";
 
 /**
  * Каждое представление владеет своей областью эффектов. Область создаётся

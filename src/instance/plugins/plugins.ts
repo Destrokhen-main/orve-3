@@ -1,4 +1,4 @@
-import { OrvePluginType } from "./types";
+import { OrvePluginType } from "./types.js";
 
 export class OrvePlugin {
   pluginContext;

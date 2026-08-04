@@ -1,16 +1,16 @@
 import { computed, createInstance, defineOptions, state } from "orve";
-import { Component } from "../src/components/component-orve";
-import { Basic } from "./cases/Base/Base";
-import { PropsDrilling } from "./cases/PropsDrilling/PropsDrilling";
-import { Styles } from "./cases/Styles/Styles";
-import { Classes } from "./cases/Classes/Classes";
-import { AsyncCase } from "./cases/AsyncCase/Async";
-import { Tree } from './cases/Tree/Tree';
-import { Todo } from "./cases/Todo/Todo";
-import { ProvideInject } from "./cases/ProvideInject/ProvideInject";
-import { Store } from "./cases/Store/Store";
-import { Async } from "./cases/Async/Async";
-import { useStore } from "./cases/Store/user";
+import { Component } from "../src/components/component-orve/index.js";
+import { Basic } from "./cases/Base/Base.js";
+import { PropsDrilling } from "./cases/PropsDrilling/PropsDrilling.js";
+import { Styles } from "./cases/Styles/Styles.js";
+import { Classes } from "./cases/Classes/Classes.js";
+import { AsyncCase } from "./cases/AsyncCase/Async.js";
+import { Tree } from './cases/Tree/Tree.js';
+import { Todo } from "./cases/Todo/Todo.js";
+import { ProvideInject } from "./cases/ProvideInject/ProvideInject.js";
+import { Store } from "./cases/Store/Store.js";
+import { Async } from "./cases/Async/Async.js";
+import { useStore } from "./cases/Store/user.js";
 
 const arrayComponent = [Basic, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Store, Async];
 const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Store', 'With request'];

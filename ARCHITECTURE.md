@@ -307,8 +307,11 @@ type Child = VNode | string | number | boolean | null | undefined | Slot | Child
 type Slot = State | Computed | (() => Child);
 ```
 
-Подключение: `tsconfig.jsxImportSource: "orve"` + `paths` на `src/jsx-runtime.ts`;
-для jest — `moduleNameMapper`. Своего babel-плагина нет и не требуется.
+Подключение у потребителя: `tsconfig.jsxImportSource: "orve"` — и всё, дальше
+работает `exports`-карта пакета (`./jsx-runtime`, `./jsx-dev-runtime`).
+Своего babel-плагина нет и не требуется. Внутри репозитория тот же импорт
+заворачивается на исходники (`paths`, `moduleNameMapper`, vite-алиасы), чтобы
+не собирать `dist/` ради dev и тестов.
 
 ### Представления (View)
 
@@ -478,17 +481,31 @@ src/
 
 Открытые места:
 
-- `JSX.IntrinsicElements` — индексная сигнатура `any`, атрибуты тегов не типизированы.
 - `For` пересобирает массив на каждое изменение (сам список диффится по `key`,
   но колбэк вызывается для всех строк); нужен вариант с per-row сигналами.
 - Нет двустороннего связывания форм (`onInput` пишут руками).
 - Нет SSR/гидрации; нет `<Portal>`, `<Suspense>`, анимаций переходов.
 - Нет делегирования событий — слушатель вешается на каждый узел.
 - `EffectScope` создаётся даже для текстового узла — можно сделать ленивой.
-- Сборка примеров: `jsxImportSource: "orve"` резолвится через `paths` и
-  `moduleNameMapper`; для реального бандла нужен алиас на пакет.
 
-## 6. Разработка
+## 7. Пакет и сборка
+
+Пакет называется `orve`, собирается в ESM (`"type": "module"`, `tsc` → `dist/`),
+относительные импорты в `src/` пишутся с расширением `.js` — как требует
+ESM-резолвинг Node и `moduleResolution: nodenext`.
+
+`exports`-карта отдаёт три входа: `orve`, `orve/jsx-runtime`,
+`orve/jsx-dev-runtime` — каждый с `types` и рантайм-файлом. Стороннему проекту
+достаточно поставить пакет и указать `jsxImportSource: "orve"`; алиасы в его
+конфигах не нужны — проверено на `tsc` с `nodenext` и `bundler`, `vite build`
+и импорте из Node ESM.
+
+Алиасы остаются только внутри репозитория и ведут на `src/`:
+`paths` (tsconfig), `moduleNameMapper` (jest), `resolve.alias` (vite). Jest
+дополнительно снимает `.js` с относительных импортов (`^(\.{1,2}/.*)\.js$`),
+потому что на диске лежат `.ts`, и компилирует тесты в CJS — сам раннер не ESM.
+
+## 8. Разработка
 
 ```bash
 pnpm dev          # Vite: playground/ в браузере, порт 5273
@@ -503,7 +520,7 @@ pnpm build        # tsc → dist/
 esbuild с `jsxImportSource: "orve"`. Свой `playground/tsconfig.json` нужен из-за
 `rootDir: src` в корневом конфиге.
 
-## 7. Соглашения
+## 9. Соглашения
 
 - Пропсы читаются только через `props.x` — см. предупреждение в разделе 2.
   В примерах и в `playground/` этот стиль соблюдается везде: любой `({ x })`

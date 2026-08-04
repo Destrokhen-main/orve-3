@@ -1,5 +1,5 @@
 import { defineOptions, onUnmounted } from "orve";
-import { resetStore, useStore } from "./user";
+import { resetStore, useStore } from "./user.js";
 
 const ComponentBase = () => {
   const store = useStore();

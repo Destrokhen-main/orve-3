@@ -1,5 +1,5 @@
-import { core } from "../core";
-import { StateOptions } from "./types";
+import { core } from "../core/index.js";
+import { StateOptions } from "./types.js";
 
 export class State<T> {
   private _value: T;

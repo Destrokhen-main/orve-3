@@ -1,7 +1,7 @@
-import { Effect, EffectOptions } from "./effect";
-import { Job, scheduler } from "./scheduler";
-import { getActiveEffect } from "./stack";
-import { VALUE_KEY } from "./types";
+import { Effect, EffectOptions } from "./effect.js";
+import { Job, scheduler } from "./scheduler.js";
+import { getActiveEffect } from "./stack.js";
+import { VALUE_KEY } from "./types.js";
 
 /** Эффекты, созданные через устаревший `setEffectOnces` — чтобы их можно было остановить по ссылке на fn. */
 const legacyEffects = new WeakMap<() => void, Effect<unknown>>();
@@ -85,16 +85,16 @@ export function setEffectOnces(fn: () => void) {
   return _effect;
 }
 
-export { cleanup, Effect } from "./effect";
-export type { EffectOptions } from "./effect";
-export { flushSync, nextTick } from "./scheduler";
-export type { Job } from "./scheduler";
+export { cleanup, Effect } from "./effect.js";
+export type { EffectOptions } from "./effect.js";
+export { flushSync, nextTick } from "./scheduler.js";
+export type { Job } from "./scheduler.js";
 export {
   EffectScope,
   effectScope,
   getCurrentScope,
   onScopeDispose,
-} from "./scope";
-export { getActiveEffect, untrack } from "./stack";
-export { VALUE_KEY } from "./types";
-export type { Reactive } from "./types";
+} from "./scope.js";
+export { getActiveEffect, untrack } from "./stack.js";
+export { VALUE_KEY } from "./types.js";
+export type { Reactive } from "./types.js";

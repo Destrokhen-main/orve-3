@@ -1,5 +1,5 @@
-import { ComponentView } from "../components/component";
-import { getCurrentContext } from "../instance/context";
+import { ComponentView } from "../components/component/index.js";
+import { getCurrentContext } from "../instance/context/index.js";
 import {
   isPrimitiveChild,
   isSlot,
@@ -7,12 +7,12 @@ import {
   normalizeChildren,
   readSlot,
   toText,
-} from "./jsx";
-import { Child, ComponentFn, FRAGMENT, View } from "./types";
-import { DynamicView } from "./views/dynamic";
-import { ElementView } from "./views/element";
-import { FragmentView } from "./views/fragment";
-import { TextView } from "./views/text";
+} from "./jsx.js";
+import { Child, ComponentFn, FRAGMENT, View } from "./types.js";
+import { DynamicView } from "./views/dynamic.js";
+import { ElementView } from "./views/element.js";
+import { FragmentView } from "./views/fragment.js";
+import { TextView } from "./views/text.js";
 
 /**
  * Единая точка разбора JSX-значения в представление.

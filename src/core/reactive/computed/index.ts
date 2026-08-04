@@ -1,5 +1,5 @@
-import { core, Effect, untrack } from "../core";
-import { ComputedOptions } from "./types";
+import { core, Effect, untrack } from "../core/index.js";
+import { ComputedOptions } from "./types.js";
 
 export class Computed<T> {
   private _value!: T;

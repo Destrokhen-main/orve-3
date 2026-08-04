@@ -1,7 +1,7 @@
-import { patchClass } from "./pathProps/class";
-import { patchImage } from "./pathProps/image";
-import { patchListener } from "./pathProps/listener";
-import { patchStyle } from "./pathProps/style";
+import { patchClass } from "./pathProps/class.js";
+import { patchImage } from "./pathProps/image.js";
+import { patchListener } from "./pathProps/listener.js";
+import { patchStyle } from "./pathProps/style.js";
 
 export function patchProps(
   el: any,

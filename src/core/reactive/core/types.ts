@@ -1,5 +1,5 @@
-import type { Computed } from "../computed";
-import type { State } from "../state";
+import type { Computed } from "../computed/index.js";
+import type { State } from "../state/index.js";
 
 export type Reactive<T = any> = State<T> | Computed<T>;
 

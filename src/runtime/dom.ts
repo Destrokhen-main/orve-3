@@ -1,4 +1,4 @@
-import { MATHML_URI, NS, SVG_URI } from "./namespace";
+import { MATHML_URI, NS, SVG_URI } from "./namespace.js";
 
 /** Пропы, которые обязаны идти в DOM-свойство: атрибут задаёт лишь начальное значение. */
 const DOM_PROPS = new Set([

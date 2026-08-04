@@ -1,4 +1,4 @@
-import type { Effect } from "./effect";
+import type { Effect } from "./effect.js";
 
 /**
  * Стек активных эффектов. Именно стек, а не одна ячейка: рендер компонента

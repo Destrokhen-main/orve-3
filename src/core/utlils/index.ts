@@ -1,1 +1,1 @@
-export * from './getType';
+export * from './getType.js';

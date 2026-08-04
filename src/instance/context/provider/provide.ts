@@ -1,4 +1,4 @@
-import { getCurrentContext } from "../context";
+import { getCurrentContext } from "../context.js";
 
 export function provide<T>(key: string | symbol, value: T): void {
   const ctx = getCurrentContext();

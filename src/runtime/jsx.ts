@@ -1,6 +1,6 @@
-import { Computed } from "../core/reactive/computed";
-import { State } from "../core/reactive/state";
-import { Child, FRAGMENT, Key, Props, Slot, VNode } from "./types";
+import { Computed } from "../core/reactive/computed/index.js";
+import { State } from "../core/reactive/state/index.js";
+import { Child, FRAGMENT, Key, Props, Slot, VNode } from "./types.js";
 
 export const Fragment = FRAGMENT;
 

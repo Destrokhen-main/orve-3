@@ -5,4 +5,4 @@ export type {
   Props,
   Render,
   VNode,
-} from "../runtime/types";
+} from "../runtime/types.js";

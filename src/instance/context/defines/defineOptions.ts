@@ -1,5 +1,5 @@
-import { getCurrentContext } from "../context";
-import { ComponentOptions } from "./types";
+import { getCurrentContext } from "../context.js";
+import { ComponentOptions } from "./types.js";
 
 export function defineOptions(options: ComponentOptions): void {
   const ctx = getCurrentContext();

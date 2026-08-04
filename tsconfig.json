@@ -25,7 +25,9 @@
   ],
   "exclude": [
     "./node_modules/**/*",
+    "**/__tests__/**/*",
     "**/*.test.ts",
+    "**/*.test.tsx",
     "**/*.mock.ts",
     "./src/components_old/**/*"
   ]

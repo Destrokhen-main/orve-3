@@ -1,3 +1,3 @@
-export { For } from "./For";
-export { If } from "./If";
-export { Component } from './Component';
+export { For } from "./For.js";
+export { If } from "./If.js";
+export { Component } from './Component.js';

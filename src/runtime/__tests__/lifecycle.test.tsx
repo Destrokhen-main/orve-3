@@ -1,13 +1,13 @@
-import { defineOptions } from "../..";
+import { defineOptions } from "../../index.js";
 import {
   onBeforeUnmounted,
   onMounted,
   onUnmounted,
-} from "../../components/component";
-import { Component, If } from "../../components/component-orve";
-import { nextTick, state } from "../../core/reactive";
-import { createInstance } from "../../instance";
-import { ComponentFn } from "../types";
+} from "../../components/component/index.js";
+import { Component, If } from "../../components/component-orve/index.js";
+import { nextTick, state } from "../../core/reactive/index.js";
+import { createInstance } from "../../instance/index.js";
+import { ComponentFn } from "../types.js";
 
 function mount(App: ComponentFn<any>) {
   document.body.innerHTML = '<div id="app"></div>';

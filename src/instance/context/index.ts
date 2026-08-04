@@ -4,5 +4,5 @@ export {
   popContext,
   pushContext,
   withContext,
-} from "./context";
-export type { ContextType } from "./context";
+} from "./context.js";
+export type { ContextType } from "./context.js";

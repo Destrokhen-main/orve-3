@@ -1,4 +1,4 @@
-import { objectToCss } from "./objectToCss";
+import { objectToCss } from "./objectToCss.js";
 
 export function patchStyle(
   el: Element,
