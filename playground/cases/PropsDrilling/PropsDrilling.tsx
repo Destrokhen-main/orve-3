@@ -1,4 +1,4 @@
-import { computed, single, state } from "orve"
+import { computed, defineOptions, state } from "orve"
 
 const Comp1 = (props: { text: string }) => {
   return () => (
@@ -8,7 +8,11 @@ const Comp1 = (props: { text: string }) => {
   )
 }
 
-const Comp2 = single((props: { text: any }) => {
+const Comp2 = (props: { text: any }) => {
+  defineOptions({
+    single: true
+  })
+
   const text = computed(() => props.text)
 
   return () => (
@@ -16,7 +20,7 @@ const Comp2 = single((props: { text: any }) => {
       SINGLE: {text}
     </div>
   )
-})
+}
 
 export const PropsDrilling = () => {
   const inp = state('');

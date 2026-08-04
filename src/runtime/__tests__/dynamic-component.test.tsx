@@ -1,4 +1,4 @@
-import { single } from "../../components/component";
+import { defineOptions } from "../..";
 import { Component } from "../../components/component-orve";
 import { computed, nextTick, state } from "../../core/reactive";
 import { createInstance } from "../../instance";
@@ -30,7 +30,12 @@ describe("Component", () => {
 
   it("переключает компонент при смене сигнала", async () => {
     const current = state<ComponentFn<any>>(Red);
-    const App = single(() => () => <Component is={current} text="раз" />);
+    const App = () => {
+      defineOptions({
+        single: true,
+      });
+      return () => <Component is={current} text="раз" />
+    };
 
     const view = mount(App);
     expect(view.app.querySelector("b")!.textContent).toBe("красный раз");
@@ -45,7 +50,12 @@ describe("Component", () => {
   it("принимает is из computed", async () => {
     const flag = state(true);
     const target = computed(() => (flag.value ? Red : Blue));
-    const App = single(() => () => <Component is={target} text="раз" />);
+    const App = () => {
+      defineOptions({
+        single: true,
+      });
+      return () => <Component is={target} text="раз" />
+    };
 
     const view = mount(App);
     expect(view.app.querySelector("b")).not.toBeNull();
@@ -64,7 +74,12 @@ describe("Component", () => {
       return () => <b>{props.text}</b>;
     };
 
-    const App = single(() => () => <Component is={Child} text={text} />);
+    const App = () => {
+      defineOptions({
+        single: true,
+      });
+      return () => <Component is={Child} text={text} />
+    };
 
     const view = mount(App);
     expect(view.app.querySelector("b")!.textContent).toBe("раз");
@@ -83,10 +98,20 @@ describe("Component", () => {
     const tick = state(0);
     const bind = jest.fn(() => String(tick.value));
 
-    const Watcher = single(() => () => <b>{bind}</b>);
+    const Watcher = () => {
+      defineOptions({
+        single: true,
+      });
+      return () => <b>{bind}</b>
+    };
 
     current.set(() => Watcher);
-    const App = single(() => () => <Component is={current} text="" />);
+    const App = () => {
+      defineOptions({
+        single: true,
+      });
+      return () => <Component is={current} text="" />
+    };
 
     const view = mount(App);
     expect(bind).toHaveBeenCalledTimes(1);
@@ -116,7 +141,12 @@ describe("Component", () => {
 
   it("принимает имя тега строкой", async () => {
     const tag = state("div");
-    const App = single(() => () => <Component is={tag} class="box" />);
+    const App = () => {
+      defineOptions({
+        single: true,
+      });
+      return () => <Component is={tag} class="box" />
+    };
 
     const view = mount(App);
     expect(view.html).toBe('<div class="box"></div>');
@@ -209,7 +239,12 @@ describe("Component", () => {
 
   it("ничего не рендерит на пустом is", async () => {
     const current = state<ComponentFn<any> | null>(null);
-    const App = single(() => () => <Component is={current} text="раз" />);
+    const App = () => {
+      defineOptions({
+        single: true,
+      });
+      return () => <Component is={current} text="раз" />
+    };
 
     const view = mount(App);
     expect(view.html).toBe("");

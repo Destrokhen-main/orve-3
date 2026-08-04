@@ -1,7 +1,11 @@
-import { single, state, If, For } from "orve";
+import { state, If, For, defineOptions } from "orve";
 import { Todo } from "./Todo";
 
-const Form = single(({ createTodo }: { createTodo: (name: string) => void }) => {
+const Form = ({ createTodo }: { createTodo: (name: string) => void }) => {
+  defineOptions({
+    single: true,
+  });
+
   const errorMessage = state<string | null>(null);
   const name = state('');
 
@@ -32,9 +36,13 @@ const Form = single(({ createTodo }: { createTodo: (name: string) => void }) => 
       </form>
     </section>
   )
-})
+}
 
-const List = single((props: { list: Todo[], switchStatus: (id: number) => void, deleteTodo: (id: number) => void }) => {
+const List = (props: { list: Todo[], switchStatus: (id: number) => void, deleteTodo: (id: number) => void }) => {
+  defineOptions({
+    single: true,
+  });
+
   return () => (
     <section>
       <For each={() => props.list}>
@@ -50,9 +58,13 @@ const List = single((props: { list: Todo[], switchStatus: (id: number) => void, 
       </For>
     </section>
   )
-})
+}
 
-export const TodoSingle = single(() => {
+export const TodoSingle = () => {
+  defineOptions({
+    single: true,
+  });
+
   const listTodo = state<Todo[]>([
     { id: 1, name: 'test-1', done: false },
     { id: 2, name: 'test-2', done: true },
@@ -80,4 +92,4 @@ export const TodoSingle = single(() => {
       <List list={listTodo} switchStatus={switchStatus} deleteTodo={deleteTodo}/>
     </section>
   )
-})
+}

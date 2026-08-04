@@ -1,3 +1,3 @@
 export type ComponentOptions = {
-  single: boolean
+  single?: boolean;
 };

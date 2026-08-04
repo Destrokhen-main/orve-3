@@ -1,6 +1,6 @@
+import { defineOptions } from "../..";
 import { resolve } from "../../runtime/jsx";
 import { Child, MaybeReactive } from "../../runtime/types";
-import { single } from "../component/single";
 
 export type IfProps = {
   /** Значение, сигнал или тонк — разворачиваются все три варианта. */
@@ -16,11 +16,15 @@ export type IfProps = {
  * Возвращает тонк — он становится реактивным слотом, и при смене условия
  * пересобирается только это поддерево.
  */
-export const If = single((props: IfProps) => {
+export const If = (props: IfProps) => {
+  defineOptions({
+    single: true,
+  });
+
   return () => () => {
     if (resolve(props.when)) {
       return props.then?.();
     }
     return props.else ? props.else() : null;
   };
-});
+};

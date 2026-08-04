@@ -1,6 +1,11 @@
-import { single, state, If, For } from "orve";
+import { state, If, For, defineOptions } from "orve";
 
-export const Single = single(() => {
+export const Single = () => {
+
+  defineOptions({
+    single: true,
+  });
+
   const count = state(0);
   const items = state<string[]>([]);
 
@@ -9,8 +14,8 @@ export const Single = single(() => {
       <h2>Сингл</h2>
       <p class={() => (count.value > 2 ? "warn" : "")}>{count}</p>
 
-      <If 
-        when={() => count.value > 0} 
+      <If
+        when={() => count.value > 0}
         then={() => <p>уже что-то есть</p>}
         else={() => <p>пока ноль</p>}
       />
@@ -31,4 +36,4 @@ export const Single = single(() => {
       </button>
     </section>
   );
-});
+};

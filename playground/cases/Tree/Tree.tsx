@@ -1,7 +1,11 @@
-import { single, state } from "orve"
+import { defineOptions, state } from "orve"
 
-export const SingleComp = single(() => {
+export const SingleComp = () => {
   const num = state(0);
+
+  defineOptions({
+    single: true,
+  });
 
   return () => (
     <div>
@@ -13,7 +17,7 @@ export const SingleComp = single(() => {
       <button onClick={() => num.set((v) => v + 1 )}>single reload</button>
     </div>
   )
-})
+}
 
 export const Base = () => {
   const num = state(0);

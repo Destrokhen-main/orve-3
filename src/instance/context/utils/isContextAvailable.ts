@@ -1,3 +1,7 @@
-export function isContextAvailable(cxt: null | Record<string | symbol, unknown>): cxt is Record<string | symbol, unknown> {
-  return !!cxt
+import { ContextType } from "../context";
+
+export function isContextAvailable(
+  ctx: ContextType | null,
+): ctx is ContextType {
+  return ctx !== null;
 }

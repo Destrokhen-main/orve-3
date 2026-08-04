@@ -1,7 +1,7 @@
+import { defineOptions } from "../..";
 import type { Computed, State } from "../../core/reactive";
 import { isVNode, jsx } from "../../runtime/jsx";
 import { ComponentFn, Props, VNode } from "../../runtime/types";
-import { single } from "../component/single";
 
 /**
  * Что рендерить: компонент, имя тега, уже готовый JSX-узел или ничего.
@@ -59,7 +59,11 @@ function forward(props: Props): Props {
  * `is` принимает и строку — тогда рендерится обычный тег, — и уже готовый
  * узел: `computed`, возвращающий `<Card />`, кладётся в `is` как есть.
  */
-const Dynamic = single((props: ComponentProps) => {
+const Dynamic = (props: ComponentProps) => {
+  defineOptions({
+    single: true,
+  });
+
   return () => () => {
     // без resolve: функция здесь — это сам компонент, а не тонк
     const target = props.is as DynamicTarget;
@@ -80,6 +84,6 @@ const Dynamic = single((props: ComponentProps) => {
 
     return jsx(target, forwarded);
   };
-});
+};
 
 export const Component = Dynamic as ComponentFn<ComponentProps>;

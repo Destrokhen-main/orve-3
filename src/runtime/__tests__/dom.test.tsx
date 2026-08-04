@@ -1,6 +1,6 @@
-import { single } from "../../components/component";
 import { nextTick, state } from "../../core/reactive";
 import { createInstance } from "../../instance";
+import { defineOptions } from "../../instance/context/defines/defineOptions";
 import { ComponentFn } from "../types";
 
 function mount(Component: ComponentFn<any>) {
@@ -129,7 +129,12 @@ describe("DOM-слой", () => {
   describe("свойства формы", () => {
     it("пишет value в DOM-свойство, а не в атрибут", async () => {
       const text = state("привет");
-      const App = single(() => () => <input value={text} />);
+      const App = () => {
+        defineOptions({
+          single: true,
+        });
+        return () => <input value={text} />
+      };
 
       const { app } = mount(App);
       const input = app.querySelector("input") as HTMLInputElement;
@@ -142,7 +147,12 @@ describe("DOM-слой", () => {
 
     it("переключает checked", async () => {
       const on = state(false);
-      const App = single(() => () => <input type="checkbox" checked={on} />);
+      const App = () => {
+        defineOptions({
+          single: true,
+        });
+        return () => <input type="checkbox" checked={on} />
+      };
 
       const { app } = mount(App);
       const input = app.querySelector("input") as HTMLInputElement;

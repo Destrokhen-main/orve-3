@@ -1,4 +1,12 @@
 import { effect, untrack } from "../../core/reactive";
+import {
+  ContextType,
+  createContext,
+  getCurrentContext,
+  popContext,
+  pushContext,
+  withContext,
+} from "../../instance/context/context";
 import { isVNode } from "../../runtime/jsx";
 import { createView } from "../../runtime/mount";
 import { NS, getNS, withNS } from "../../runtime/namespace";
@@ -16,7 +24,6 @@ import {
   runHooks,
 } from "./lifecycle";
 import { ReactiveProps } from "./props";
-import { isSingle } from "./single";
 
 /**
  * Экземпляр компонента. setup выполняется один раз внутри собственной
@@ -34,6 +41,7 @@ export class ComponentView extends BaseView {
   private readonly ns: NS = getNS();
   private readonly hooks: Hooks = createHooks();
   private destroyed = false;
+  private ctx: ContextType | null = null;
 
   constructor(
     private vnode: VNode,
@@ -48,29 +56,44 @@ export class ComponentView extends BaseView {
     this.anchor = createComment("");
     parent.insertBefore(this.anchor, anchor);
 
+    // Захватываем родительский контекст и создаём собственный.
+    // Это нужно сделать до beginMount, чтобы дочерние компоненты
+    // во время applyTree видели корректную цепочку контекстов.
+    const parentCtx = getCurrentContext();
+    this.ctx = createContext(parentCtx);
+
     beginMount();
     try {
       this.scope.run(() => {
         this.props = new ReactiveProps(this.vnode.props);
 
         // setup не должен ничего трекать: это не реактивное вычисление.
-        // На время вызова компонент становится текущим — сюда пишут хуки.
+        // На время вызова компонент становится текущим — сюда пишут хуки и provide.
         pushHooks(this.hooks);
+        pushContext(this.ctx!);
         try {
           this.render = untrack(() => this.fn(this.props!.proxy));
         } finally {
           popHooks();
+          popContext();
         }
 
-        if (isSingle(this.fn)) {
-          this.applyTree(untrack(this.render));
+        if (this.ctx?.options.single) {
+          // Сингл: render вызывается один раз, контекст нужен для дочерних setup
+          withContext(this.ctx!, () => this.applyTree(untrack(this.render!)));
           return;
         }
 
         effect(() => {
           const next = this.render!();
-          // работа с DOM не должна попадать в зависимости render-эффекта
-          untrack(() => this.scope.run(() => this.applyTree(next)));
+          // работа с DOM не должна попадать в зависимости render-эффекта;
+          // withContext нужен, чтобы дочерние компоненты в applyTree
+          // находили правильную цепочку провайдеров при любом перерендере
+          untrack(() =>
+            this.scope.run(() =>
+              withContext(this.ctx!, () => this.applyTree(next)),
+            ),
+          );
         });
       });
 

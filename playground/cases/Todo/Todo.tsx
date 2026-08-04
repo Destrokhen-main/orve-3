@@ -1,4 +1,4 @@
-import { computed, For, If, single, State, state } from "orve";
+import { defineOptions } from "orve";
 import { TodoBasic } from "./Todo.base";
 import { TodoSingle } from "./Todo.single";
 
@@ -9,11 +9,15 @@ export type Todo = {
 };
 
 // Рут определяем при необходимость, не обязательно указывать single
-export const Todo = single(() => {
+export const Todo = () => {
+  defineOptions({
+    single: true,
+  });
+
   return () => (
     <>
       <TodoSingle />
       <TodoBasic />
     </>
   )
-})
+}

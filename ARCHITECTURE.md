@@ -123,16 +123,17 @@ const Counter = () => {
 - Условия и списки — обычный JS (`&&`, `map`), структура дерева свободная.
 - Списки требуют `key`, иначе узлы сопоставляются по позиции.
 
-### Сингл (маркер `single`)
+### Сингл (маркер `defineOptions`)
 
 `render` вызывается **ровно один раз**. Реактивность живёт только там, куда в
 дерево попал сам сигнал или тонк.
 
 ```tsx
-const Counter = single(() => {
+const Counter = () => {
+  defineOptions({ single: true });
   const count = state(0);
   return () => <span>{count}</span>;          // СИГНАЛ
-});
+};
 ```
 
 - В слотах — сигнал `{count}` или тонк `{() => expr}`. `{count.value}`
@@ -216,7 +217,78 @@ Vue) — макросом, переписывающим `text` обратно в
 
 ---
 
-## 3. Рантайм (`src/runtime`)
+## 3. Контекст компонента (`src/instance/context`)
+
+### provide / inject
+
+Механизм передачи произвольных значений от родителя всем потомкам без явного
+пробрасывания через пропсы. Не реактивный: передаётся обычный объект.
+Регистрация происходит в `setup`, доступ — тоже в `setup` любого потомка.
+
+```tsx
+const key = Symbol('theme');
+
+const Parent = () => {
+  provide(key, { color: 'red' });
+  return () => <Child />;
+};
+
+const Child = () => {
+  const theme = inject<{ color: string }>(key);
+  return () => <div style={{ color: theme?.color }} />;
+};
+```
+
+- `provide(key, value)` — записывает значение в контекст текущего компонента.
+  Ключ — `string` или `symbol`.
+- `inject<T>(key, defaultValue?)` — ищет значение вверх по дереву контекстов:
+  от текущего компонента к родителю, прадеду и т.д. Возвращает первое найденное
+  или `defaultValue`, если ничего не нашлось.
+- Оба вызова допустимы только в `setup`. Вне него — предупреждение `[orve]`
+  в консоль, `provide` игнорируется, `inject` возвращает `defaultValue`.
+- Контекстов может быть сколько угодно: несколько `provide` с разными ключами
+  внутри одного компонента — норма.
+
+### ContextType и стек контекстов
+
+Каждый [`ComponentView`](../src/components/component/view.ts) создаёт
+собственный `ContextType` при монтировании:
+
+```ts
+type ContextType = {
+  provide: Record<string | symbol, unknown>;  // значения, объявленные provide()
+  options: ComponentOptions;                   // настройки defineOptions()
+  parent: ContextType | null;                 // ссылка на контекст родителя
+};
+```
+
+Стек в [`context.ts`](../src/instance/context/context.ts) работает по той же
+схеме, что и стек хуков в [`lifecycle.ts`](../src/components/component/lifecycle.ts):
+
+| Функция | Назначение |
+|---|---|
+| `createContext(parent)` | создать новый контекст с указателем на родителя |
+| `pushContext(ctx)` | сделать контекст текущим (вход в setup) |
+| `popContext()` | снять контекст (выход из setup) |
+| `getCurrentContext()` | прочитать текущий контекст |
+| `withContext(ctx, fn)` | выполнить `fn` в контексте `ctx` |
+
+В `ComponentView.mount`:
+1. Захватывается `parentCtx = getCurrentContext()` — контекст родителя.
+2. Создаётся `myCtx = createContext(parentCtx)`.
+3. На время `setup` выставляется `pushContext(myCtx)` / `popContext()`.
+4. Все вызовы `applyTree` оборачиваются в `withContext(myCtx, ...)`,
+   чтобы при каждом перерендере дочерние компоненты находили цепочку провайдеров.
+
+### defineOptions
+
+`defineOptions(options)` пишет в `getCurrentContext().options`.
+Тот же стек, тот же механизм — никакого отдельного глобального состояния.
+В будущем сюда можно добавить любые настройки уровня компонента.
+
+---
+
+## 4. Рантайм (`src/runtime`)
 
 ### JSX-фабрика
 
@@ -345,7 +417,7 @@ instance.unmount();
 
 ---
 
-## 4. Карта файлов
+## 5. Карта файлов
 
 ```
 src/
@@ -360,10 +432,16 @@ src/
     patch.ts            patch + patchChildren (реконсиляция)
     views/              base, text, element, fragment, dynamic
   components/
-    component/          single(), ReactiveProps, ComponentView, хуки жизненного цикла
+    component/          ReactiveProps, ComponentView, хуки жизненного цикла
     component-orve/     If, For, Component — управляющие компоненты для сингла
     element/, text/, fragment/   пустые заготовки, вытеснены runtime/views
-  instance/             OrveInstance: плагины, rootComponent, mountRoot, unmount
+  instance/
+    index.ts            OrveInstance: плагины, rootComponent, mountRoot, unmount
+    context/
+      context.ts        ContextType, стек контекстов (push/pop/get/with/create)
+      provider/         provide(), inject()
+      defines/          defineOptions()
+      utils/            isContextAvailable
   utils/helperNode/     низкоуровневые DOM-хелперы (createText/insert/remove/…)
   jsx-runtime.ts        jsx/jsxs/Fragment + namespace JSX
   example/              basic.tsx, single.tsx, mixed.tsx
@@ -371,7 +449,7 @@ src/
 
 ---
 
-## 5. Состояние и что дальше
+## 6. Состояние и что дальше
 
 Сделано и покрыто тестами (`src/core/reactive/__tests__`, `src/runtime/__tests__`):
 оба режима, стык режимов, реактивные атрибуты, события, списки с `key`,
@@ -384,7 +462,6 @@ src/
 - `For` пересобирает массив на каждое изменение (сам список диффится по `key`,
   но колбэк вызывается для всех строк); нужен вариант с per-row сигналами.
 - Нет двустороннего связывания форм (`onInput` пишут руками).
-- Нет `context`/DI между компонентами.
 - Нет SSR/гидрации; нет `<Portal>`, `<Suspense>`, анимаций переходов.
 - Нет делегирования событий — слушатель вешается на каждый узел.
 - `EffectScope` создаётся даже для текстового узла — можно сделать ленивой.

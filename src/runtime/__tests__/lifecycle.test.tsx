@@ -1,8 +1,8 @@
+import { defineOptions } from "../..";
 import {
   onBeforeUnmounted,
   onMounted,
   onUnmounted,
-  single,
 } from "../../components/component";
 import { Component, If } from "../../components/component-orve";
 import { nextTick, state } from "../../core/reactive";
@@ -97,10 +97,13 @@ describe("хуки жизненного цикла", () => {
 
   it("работает и в сингл-режиме", () => {
     const hook = jest.fn();
-    const App = single(() => {
+    const App = () => {
+      defineOptions({
+        single: true,
+      });
       onMounted(hook);
       return () => <b />;
-    });
+    };
 
     mount(App);
     expect(hook).toHaveBeenCalledTimes(1);
@@ -139,9 +142,12 @@ describe("хуки жизненного цикла", () => {
       onUnmounted(unmounted);
       return () => <i />;
     };
-    const App = single(() => () => (
-      <If when={visible} then={() => <Child />} />
-    ));
+    const App = () => () => {
+      defineOptions({
+        single: true,
+      });
+      return <If when={visible} then={() => <Child />} />
+    };
 
     const { app } = mount(App);
     expect(unmounted).toHaveBeenCalledTimes(0);
@@ -167,7 +173,12 @@ describe("хуки жизненного цикла", () => {
     };
 
     const current = state<ComponentFn<any>>(First);
-    const App = single(() => () => <Component is={current} />);
+    const App = () => {
+      defineOptions({
+        single: true,
+      });
+      return () => <Component is={current} />
+    };
 
     mount(App);
     expect(unmounted).toHaveBeenCalledTimes(0);

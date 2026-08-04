@@ -24,14 +24,13 @@ export type {
 } from "./core/reactive";
 
 export {
-  isSingle,
   onBeforeUnmounted,
   onMounted,
   onUnmounted,
-  single,
 } from "./components/component";
 export type { LifecycleHook } from "./components/component";
 export { provide, inject } from "./instance/context/provider";
+export { defineOptions } from "./instance/context/defines/defineOptions";
 export { createInstance, OrveInstance } from "./instance";
 export { Component, For, If } from "./components/component-orve";
 export type {

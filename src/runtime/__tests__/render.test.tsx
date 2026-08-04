@@ -1,4 +1,4 @@
-import { single } from "../../components/component";
+import { defineOptions } from "../..";
 import { For, If } from "../../components/component-orve";
 import { computed, nextTick, state } from "../../core/reactive";
 import { createInstance } from "../../instance";
@@ -173,7 +173,10 @@ describe("рендер", () => {
     it("вызывает render один раз и правит текст точечно", async () => {
       const count = state(0);
       const render = jest.fn(() => <span>{count}</span>);
-      const App = single(() => render);
+      const App = () => {
+        defineOptions({ single: true });
+        return render;
+      };
 
       const view = mount(App);
       expect(view.app.textContent).toBe("0");
@@ -188,12 +191,15 @@ describe("рендер", () => {
     it("понимает computed и тонк", async () => {
       const count = state(2);
       const double = computed(() => count.value * 2);
-      const App = single(() => () => (
-        <div>
-          <i>{double}</i>
-          <b>{() => `#${count.value}`}</b>
-        </div>
-      ));
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <div>
+            <i>{double}</i>
+            <b>{() => `#${count.value}`}</b>
+          </div>
+        );
+      };
 
       const view = mount(App);
       expect(view.app.querySelector("i")!.textContent).toBe("4");
@@ -208,9 +214,12 @@ describe("рендер", () => {
 
     it("привязывает реактивный атрибут", async () => {
       const count = state(0);
-      const App = single(() => () => (
-        <div class={() => (count.value > 0 ? "hot" : "cold")} />
-      ));
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <div class={() => (count.value > 0 ? "hot" : "cold")} />
+        );
+      };
 
       const view = mount(App);
       expect(view.html).toBe('<div class="cold"></div>');
@@ -222,15 +231,18 @@ describe("рендер", () => {
 
     it("If переключает поддерево", async () => {
       const visible = state(false);
-      const App = single(() => () => (
-        <div>
-          <If
-            when={visible}
-            then={() => <b>есть</b>}
-            else={() => <i>нет</i>}
-          />
-        </div>
-      ));
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <div>
+            <If
+              when={visible}
+              then={() => <b>есть</b>}
+              else={() => <i>нет</i>}
+            />
+          </div>
+        );
+      };
 
       const view = mount(App);
       expect(view.app.querySelector("i")!.textContent).toBe("нет");
@@ -244,13 +256,16 @@ describe("рендер", () => {
 
     it("If принимает условие тонком", async () => {
       const count = state(0);
-      const App = single(() => () => (
-        <If
-          when={() => count.value > 1}
-          then={() => <b>много</b>}
-          else={() => <i>мало</i>}
-        />
-      ));
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <If
+            when={() => count.value > 1}
+            then={() => <b>много</b>}
+            else={() => <i>мало</i>}
+          />
+        );
+      };
 
       const view = mount(App);
       expect(view.app.querySelector("i")!.textContent).toBe("мало");
@@ -262,13 +277,16 @@ describe("рендер", () => {
 
     it("For принимает список тонком", async () => {
       const items = state(["a"]);
-      const App = single(() => () => (
-        <ul>
-          <For each={() => items.value}>
-            {(item: string, index: number) => <li key={index}>{item}</li>}
-          </For>
-        </ul>
-      ));
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <ul>
+            <For each={() => items.value}>
+              {(item: string, index: number) => <li key={index}>{item}</li>}
+            </For>
+          </ul>
+        );
+      };
 
       const view = mount(App);
       expect(view.app.querySelectorAll("li").length).toBe(1);
@@ -280,13 +298,16 @@ describe("рендер", () => {
 
     it("For рендерит и обновляет список", async () => {
       const items = state(["a", "b"]);
-      const App = single(() => () => (
-        <ul>
-          <For each={items}>
-            {(item: string, index: number) => <li key={index}>{item}</li>}
-          </For>
-        </ul>
-      ));
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <ul>
+            <For each={items}>
+              {(item: string, index: number) => <li key={index}>{item}</li>}
+            </For>
+          </ul>
+        );
+      };
 
       const view = mount(App);
       expect([...view.app.querySelectorAll("li")].map((li) => li.textContent)).toStrictEqual(
@@ -307,12 +328,13 @@ describe("рендер", () => {
       const render = jest.fn();
       const count = state(0);
 
-      const Badge = single((props: { count: number }) => {
+      const Badge = (props: { count: number }) => {
+        defineOptions({ single: true });
         return () => {
           render();
           return <span>{() => `x${props.count}`}</span>;
         };
-      });
+      };
 
       const App = () => () => (
         <div>
@@ -337,7 +359,10 @@ describe("рендер", () => {
       const Rows = (props: { items: string[] }) => {
         return () => <ul>{props.items.map((row, i) => <li key={i}>{row}</li>)}</ul>;
       };
-      const App = single(() => () => <Rows items={items} />);
+      const App = () => {
+        defineOptions({ single: true });
+        return () => <Rows items={items} />;
+      };
 
       const view = mount(App);
       expect(view.app.querySelectorAll("li").length).toBe(1);
@@ -370,12 +395,18 @@ describe("рендер", () => {
       const count = state(0);
       const bind = jest.fn(() => String(count.value));
 
-      const Row = single(() => () => <span>{bind}</span>);
-      const App = single(() => () => (
-        <div>
-          <If when={visible} then={() => <Row />} />
-        </div>
-      ));
+      const Row = () => {
+        defineOptions({ single: true });
+        return () => <span>{bind}</span>;
+      };
+      const App = () => {
+        defineOptions({ single: true });
+        return () => (
+          <div>
+            <If when={visible} then={() => <Row />} />
+          </div>
+        );
+      };
 
       const view = mount(App);
       expect(bind).toHaveBeenCalledTimes(1);

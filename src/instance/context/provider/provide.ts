@@ -1,10 +1,14 @@
-import { cxt } from "..";
-import { isContextAvailable } from "../utils/isContextAvailable";
+import { getCurrentContext } from "../context";
 
-export function provide<T>(key: string | symbol, value: T) {
-  if (!isContextAvailable(cxt)) {
+export function provide<T>(key: string | symbol, value: T): void {
+  const ctx = getCurrentContext();
+
+  if (!ctx) {
+    console.warn(
+      "[orve] provide вызван вне setup компонента — значение проигнорировано.",
+    );
     return;
   }
 
-  cxt.provide[key] = value;
+  ctx.provide[key] = value;
 }

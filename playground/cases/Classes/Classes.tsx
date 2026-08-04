@@ -1,4 +1,4 @@
-import { computed, single, state } from "orve"
+import { defineOptions, state } from "orve"
 
 const BASE = () => {
   const isWarn = state(false);
@@ -16,7 +16,11 @@ const BASE = () => {
   )
 }
 
-const SINGLE = single(() => {
+const SINGLE = () => {
+  defineOptions({
+    single: true,
+  })
+
   const isWarn = state(false);
 
   return () => (
@@ -30,7 +34,7 @@ const SINGLE = single(() => {
       <button onClick={() => isWarn.set((v) => !v)}>{() => isWarn.value ? '+' : '-'}</button>
     </div>
   )
-})
+}
 
 export const Classes = () => {
   return () => (

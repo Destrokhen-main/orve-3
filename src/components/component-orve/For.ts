@@ -1,6 +1,6 @@
+import { defineOptions } from "../..";
 import { resolve } from "../../runtime/jsx";
 import { Child, MaybeReactive } from "../../runtime/types";
-import { single } from "../component/single";
 
 export type ForProps<T = any> = {
   /** Массив, сигнал или тонк — разворачиваются все три варианта. */
@@ -13,9 +13,13 @@ export type ForProps<T = any> = {
  * тот же реконсилятор, что и в базовом режиме, поэтому строки с `key`
  * переиспользуются, а не пересоздаются.
  */
-export const For = single(<T,>(props: ForProps<T>) => {
+export const For = <T>(props: ForProps<T>) => {
+  defineOptions({
+    single: true,
+  });
+
   return () => () => {
     const list = resolve<T[]>(props.each) ?? [];
     return list.map((item, index) => props.children(item, index));
   };
-});
+};

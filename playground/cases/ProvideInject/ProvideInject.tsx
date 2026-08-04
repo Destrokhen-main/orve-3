@@ -1,20 +1,32 @@
-import { inject, provide } from "orve"
+import { inject, provide, State, state } from "orve"
 
-// Надо сделать работу тут
+const key = Symbol('test');
+
+const Button = () => {
+  const obj = inject<{ test: State<number> }>(key);
+
+  return () => (
+    <button onClick={() => obj?.test.set(obj.test.value + 1)}>
+      +
+    </button>
+  )
+}
+
 const Component = () => {
-  const obj = inject<{ test: number }>(key);
+  const obj = inject<{ test: State<number> }>(key);
   return () => (
     <div>
-      { obj?.test ?? 'not send' }
+      {obj?.test.value ?? 'not send'}
+      <Button />
     </div>
   )
 }
 
-const key = Symbol('test');
-
 export const ProvideInject = () => {
+  const num = state(1)
+
   provide(key, {
-    test: 1,
+    test: num,
   })
 
   return () => (

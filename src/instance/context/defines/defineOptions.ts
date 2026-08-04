@@ -1,12 +1,15 @@
-import { cxt } from "../context";
-import { isContextAvailable } from "../utils/isContextAvailable";
+import { getCurrentContext } from "../context";
 import { ComponentOptions } from "./types";
 
-export function defineOptions(options: ComponentOptions) {
-  if (!isContextAvailable(cxt)) {
-    console.warn('context not defined');
+export function defineOptions(options: ComponentOptions): void {
+  const ctx = getCurrentContext();
+
+  if (!ctx) {
+    console.warn(
+      "[orve] defineOptions вызван вне setup компонента — опции проигнорированы.",
+    );
     return;
   }
 
-  cxt.options = options;
+  ctx.options = options;
 }

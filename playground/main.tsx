@@ -1,4 +1,4 @@
-import { For, If, computed, createInstance, single, state } from "orve";
+import { computed, createInstance, defineOptions, state } from "orve";
 import { Component } from "../src/components/component-orve";
 import { Basic } from "./cases/Base/Base";
 import { Single } from "./cases/Single/Single";
@@ -15,7 +15,11 @@ const arrayComponent = [Basic, Single, BaseInput, PropsDrilling, Styles, Classes
 
 const debugPage = null;
 
-const App = single(() => {
+const App = () => {
+  defineOptions({
+    single: true,
+  })
+
   const page = state(debugPage ?? arrayComponent.length);
 
   const switchComp = computed(() => {
@@ -39,6 +43,6 @@ const App = single(() => {
       </div>
     </>
   );
-});
+};
 
 createInstance().rootComponent(App).mountRoot("#app");
