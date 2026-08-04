@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "types": ["jest"],
     "jsx": "react-jsx",
     "jsxImportSource": "orve",
     "paths": {
@@ -25,10 +26,6 @@
   ],
   "exclude": [
     "./node_modules/**/*",
-    "**/__tests__/**/*",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.mock.ts",
     "./src/components_old/**/*"
   ]
 }

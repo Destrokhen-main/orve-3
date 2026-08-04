@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // В пакет не должны попадать ни тесты, ни глобалы тест-раннера.
+    "types": []
+  },
+  "exclude": [
+    "./node_modules/**/*",
+    "./src/components_old/**/*",
+    "**/__tests__/**/*",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.mock.ts"
+  ]
+}
