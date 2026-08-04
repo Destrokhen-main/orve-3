@@ -52,12 +52,6 @@ class Core {
   cancel(job: Job) {
     scheduler.cancel(job);
   }
-
-  /** @deprecated используйте `Effect.stop()`. */
-  deleteByEffect(fn: () => void) {
-    legacyEffects.get(fn)?.stop();
-    legacyEffects.delete(fn);
-  }
 }
 
 export const core = new Core();
@@ -69,19 +63,6 @@ export const core = new Core();
 export function effect(fn: () => void, options?: EffectOptions) {
   const _effect = new Effect(fn, options);
   _effect.run();
-  return _effect;
-}
-
-/** @deprecated используйте `effect()` — он возвращает объект с `stop()`. */
-export function setEffectOnces(fn: () => void) {
-  const existing = legacyEffects.get(fn);
-  if (existing?.active) {
-    existing.run();
-    return existing;
-  }
-
-  const _effect = effect(fn);
-  legacyEffects.set(fn, _effect);
   return _effect;
 }
 

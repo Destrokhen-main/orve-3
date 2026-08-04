@@ -52,11 +52,6 @@ export class Effect<T = unknown> implements Stoppable {
     return this._paused;
   }
 
-  /** @deprecated используйте `pause()` / `resume()` */
-  get isActive() {
-    return this._active && !this._paused;
-  }
-
   set isActive(value: boolean) {
     if (value) {
       this.resume();

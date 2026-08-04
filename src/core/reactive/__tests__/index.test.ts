@@ -1,5 +1,5 @@
 import { computed } from "../computed/index.js";
-import { nextTick, setEffectOnces } from "../core/index.js";
+import { effect, nextTick } from "../core/index.js";
 import { state } from "../state/index.js";
 
 describe("reactive", () => {
@@ -8,7 +8,7 @@ describe("reactive", () => {
       const a = state(1);
 
       let i = 1;
-      setEffectOnces(() => {
+      effect(() => {
         expect(a.value).toBe(i);
       });
 
@@ -23,7 +23,7 @@ describe("reactive", () => {
         a.value;
       });
 
-      setEffectOnces(fn);
+      effect(fn);
 
       a.set(2);
       a.set(3);
@@ -40,7 +40,7 @@ describe("reactive", () => {
       const a = state(1);
 
       let i = 1;
-      setEffectOnces(() => {
+      effect(() => {
         expect(a.value).toBe(i);
       });
 
