@@ -32,8 +32,6 @@ const ComponentSingle = () => {
 export const Store = () => {
   const store = useStore();
 
-  onUnmounted(resetStore)
-
   return () => (
     <section>
       <h1>MAIN</h1>

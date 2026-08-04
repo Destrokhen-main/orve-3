@@ -6,9 +6,11 @@ const Button = () => {
   const obj = inject<{ test: State<number> }>(key);
 
   return () => (
-    <button onClick={() => obj?.test.set(obj.test.value + 1)}>
-      +
-    </button>
+    <section>
+      <button onClick={() => obj?.test.set(obj.test.value + 1)}>
+        +
+      </button>
+    </section>
   )
 }
 
@@ -17,6 +19,7 @@ const Component = () => {
   return () => (
     <div>
       {obj?.test.value ?? 'not send'}
+      <br />
       <Button />
     </div>
   )

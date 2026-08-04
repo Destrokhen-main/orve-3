@@ -1,8 +1,6 @@
 import { computed, createInstance, defineOptions, state } from "orve";
 import { Component } from "../src/components/component-orve";
 import { Basic } from "./cases/Base/Base";
-import { Single } from "./cases/Single/Single";
-import { BaseInput } from "./cases/BaseInput/BaseInput";
 import { PropsDrilling } from "./cases/PropsDrilling/PropsDrilling";
 import { Styles } from "./cases/Styles/Styles";
 import { Classes } from "./cases/Classes/Classes";
@@ -12,9 +10,10 @@ import { Todo } from "./cases/Todo/Todo";
 import { ProvideInject } from "./cases/ProvideInject/ProvideInject";
 import { Store } from "./cases/Store/Store";
 import { Async } from "./cases/Async/Async";
+import { useStore } from "./cases/Store/user";
 
-const arrayComponent = [Basic, Single, BaseInput, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Store, Async];
-const arrayButton = ['BASIC', 'Single', 'Case 1', 'Case 2', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Store', 'Async'];
+const arrayComponent = [Basic, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Store, Async];
+const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Store', 'Async'];
 
 const debugPage = null;
 
@@ -22,6 +21,9 @@ const App = () => {
   defineOptions({
     single: true,
   })
+
+  // инициализация, для кейса
+  useStore();
 
   const page = state(debugPage ?? arrayComponent.length);
 
