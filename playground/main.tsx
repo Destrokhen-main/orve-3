@@ -11,9 +11,10 @@ import { Tree } from './cases/Tree/Tree';
 import { Todo } from "./cases/Todo/Todo";
 import { ProvideInject } from "./cases/ProvideInject/ProvideInject";
 import { Store } from "./cases/Store/Store";
+import { Async } from "./cases/Async/Async";
 
-const arrayComponent = [Basic, Single, BaseInput, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Store];
-const arrayButton = ['BASIC', 'Single', 'Case 1', 'Case 2', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Store'];
+const arrayComponent = [Basic, Single, BaseInput, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Store, Async];
+const arrayButton = ['BASIC', 'Single', 'Case 1', 'Case 2', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Store', 'Async'];
 
 const debugPage = null;
 
