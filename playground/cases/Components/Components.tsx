@@ -1,6 +1,10 @@
-import { Child, Component, ComponentFn, computed, Props, state } from "orve"
+import { Child, Component, ComponentFn, computed, defineOptions, Props, state } from "orve"
 
 const Layout1: ComponentFn = (props) => {
+  defineOptions({
+    single: true
+  })
+
   return () => (
     <div style="color: red">
       {props.children}
@@ -9,6 +13,10 @@ const Layout1: ComponentFn = (props) => {
 }
 
 const Layout2: ComponentFn = (props) => {
+  defineOptions({
+    single: true
+  })
+
   return () => (
     <div style="color: yellow">
       {props.children}
