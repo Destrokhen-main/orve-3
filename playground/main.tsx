@@ -13,7 +13,7 @@ import { Async } from "./cases/Async/Async";
 import { useStore } from "./cases/Store/user";
 
 const arrayComponent = [Basic, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Store, Async];
-const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Store', 'Async'];
+const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Store', 'With request'];
 
 const debugPage = null;
 
