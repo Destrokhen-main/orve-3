@@ -13,22 +13,24 @@ const Comp2 = (props: { text: any }) => {
     single: true
   })
 
-  const text = computed(() => props.text)
-
   return () => (
     <div>
-      SINGLE: {text}
+      SINGLE: {() => props.text}
     </div>
   )
 }
 
 export const PropsDrilling = () => {
+  defineOptions({
+    single: true
+  })
+
   const inp = state('');
 
   return () => (
     <section>
-      <Comp1 text={inp.value}/>
-      <Comp2 text={inp.value}/>
+      <Comp1 text={inp}/>
+      <Comp2 text={inp}/>
       <input onInput={(e: any) => inp.value = e.target.value} />
     </section>
   )
