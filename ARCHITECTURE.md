@@ -298,7 +298,138 @@ type ContextType = {
 
 ---
 
-## 4. Рантайм (`src/runtime`)
+## 4. Плагины (`src/instance/plugins`)
+
+Плагин — это способ положить что-то (роутер, стор, i18n) в один общий объект,
+который виден из `setup` любого компонента. В отличие от `provide/inject`
+плагины не привязаны к месту в дереве: они ставятся на инстанс до монтирования
+и доступны везде.
+
+```ts
+const instance = createInstance()
+  .use(routerPlugin, { base: "/app" })
+  .use((cx, api) => {
+    cx.$store = createStore();
+    api.onUnmounted(() => cx.$store.dispose());
+  })
+  .rootComponent(App)
+  .mountRoot("#app");
+```
+
+```tsx
+const Page = () => {
+  const router = usePlugin("$router");   // либо usePlugins().$router
+  return () => <a onClick={() => router.push("/next")}>дальше</a>;
+};
+```
+
+### Форма плагина
+
+Плагин — объект `{ name?, setup }` либо просто функция `setup`:
+
+```ts
+type PluginSetup<O> = (context: PluginContext, api: PluginApi<O>) => PluginCleanup | void;
+type OrvePluginType<O> = { name?: string; setup: PluginSetup<O> };
+type OrvePluginInput<O> = OrvePluginType<O> | PluginSetup<O>;
+```
+
+`setup` вызывается **один раз**, в момент `use()`, синхронно. Первый аргумент —
+сам контекст плагинов, его можно мутировать напрямую (`cx.$router = …`). Второй —
+`PluginApi`:
+
+| Член | Назначение |
+|---|---|
+| `name` | имя плагина: из `plugin.name` либо сгенерированное `orve-plugin-N` |
+| `options` | второй аргумент `use(plugin, options)` |
+| `instance` | сам инстанс — можно доставить зависимый плагин через `api.instance.use(…)` |
+| `provide(key, value)` | типобезопасная альтернатива прямой мутации контекста |
+| `has(name)` | установлен ли плагин с таким именем — для зависимостей между плагинами |
+| `onMounted(fn)` | после монтирования корневого компонента |
+| `onUnmounted(fn)` | при `instance.unmount()` |
+
+Возвращённая из `setup` функция — тот же `onUnmounted`, только короче:
+
+```ts
+const timerPlugin: OrvePluginType = {
+  name: "timer",
+  setup(cx) {
+    const id = setInterval(tick, 1000);
+    cx.$timer = { stop: () => clearInterval(id) };
+    return () => clearInterval(id);        // cleanup
+  },
+};
+```
+
+### Реестр (`registry.ts`)
+
+`OrveInstance` не работает с плагинами напрямую — этим занимается
+`PluginRegistry`, по одному на инстанс. Он держит три вещи, которых нет в самом
+плагине:
+
+1. **Порядок.** Плагины ставятся в порядке `use()`, и каждый следующий видит
+   контекст всех предыдущих. Так один плагин строится поверх другого:
+   `cx.$b = cx.$a + 1`.
+2. **Дедупликация.** Один и тот же плагин (по ссылке) или одно и то же имя
+   ставятся один раз; повтор — предупреждение `[orve]` и пропуск. Анонимные
+   плагины получают уникальное сгенерированное имя, поэтому под дедупликацию
+   по имени не попадают.
+3. **Жизненный цикл.** `mountRoot()` вызывает `registry.mount()`, `unmount()` —
+   `registry.unmount()`.
+
+### Инварианты
+
+- **Ошибка в `setup` не роняет инстанс и не оставляет мусора.** `setup` работает
+  с копией контекста; в общий контекст она сливается только при успешном
+  завершении. Упавший плагин логируется как `[PLUGIN] "имя" …` и просто не
+  ставится — частичных изменений в контексте не остаётся.
+- **Контекст пересоздаётся, а не мутируется.** Каждый `use()` даёт новый объект.
+  Корневой `ContextType` захватывает ссылку в момент `mountRoot()`, поэтому
+  плагин, поставленный после монтирования, в уже созданных компонентах не
+  появится — но в самом инстансе он есть и свой `onMounted` получит сразу.
+- **Порядок гашения обратный установке.** `onUnmounted` и cleanup'ы идут от
+  последнего плагина к первому, как и положено ресурсам. Внутри одного плагина —
+  тоже в обратном порядке регистрации.
+- **`registry.unmount()` идёт до `view.unmount()`**, чтобы cleanup плагина ещё
+  застал живое дерево. Повторный `unmount()` хуки не продублирует.
+- **Ошибка в хуке жизненного цикла изолирована** — логируется, остальные хуки
+  отрабатывают.
+
+### Доступ из компонентов
+
+Контекст плагинов кладётся в корневой `ContextType` и наследуется вниз по
+цепочке (`createContext` копирует ссылку от родителя). Отсюда — четыре хелпера,
+все работают только в `setup`:
+
+| Функция | Поведение |
+|---|---|
+| `usePlugins()` | весь контекст; вне `setup` — warn и `{}` |
+| `usePlugin(key)` | одно значение; вне `setup` — warn и `undefined` |
+| `requirePlugin(key)` | то же, но бросает, если плагина нет |
+| `hasPlugin(key)` | тихая проверка, без warn и без броска |
+
+### Типизация
+
+Свои плагины описываются через declaration merging — тогда `usePlugin("$router")`
+вернёт нормальный тип, а не `unknown`:
+
+```ts
+declare module "orve" {
+  interface OrvePlugins {
+    $router: Router;
+  }
+}
+```
+
+`PluginContext = OrvePlugins & Record<string, unknown>` — объявленные плагины
+типизированы, остальные доступны как `unknown`.
+
+Файлы: `plugins/types.ts` (контракт), `plugins/plugins.ts` (`OrvePlugin` —
+изоляция одного плагина), `plugins/registry.ts` (`PluginRegistry` — порядок,
+дедупликация, жизненный цикл), `plugins/usePlugins.ts` (доступ из компонентов).
+
+---
+
+## 5. Рантайм (`src/runtime`)
 
 ### JSX-фабрика
 
@@ -499,7 +630,7 @@ instance.unmount();
 
 ---
 
-## 5. Карта файлов
+## 6. Карта файлов
 
 ```
 src/
@@ -518,12 +649,17 @@ src/
     component-orve/     If, For, Component — управляющие компоненты для сингла
     element/, text/, fragment/   пустые заготовки, вытеснены runtime/views
   instance/
-    index.ts            OrveInstance: плагины, rootComponent, mountRoot, unmount
+    index.ts            OrveInstance: use, rootComponent, mountRoot, unmount
     context/
       context.ts        ContextType, стек контекстов (push/pop/get/with/create)
       provider/         provide(), inject()
       defines/          defineOptions()
       utils/            isContextAvailable
+    plugins/
+      types.ts          OrvePlugins, PluginContext, PluginApi, OrvePluginInput
+      plugins.ts        OrvePlugin — изоляция одного плагина, его хуки
+      registry.ts       PluginRegistry — порядок, дедупликация, жизненный цикл
+      usePlugins.ts     usePlugins/usePlugin/requirePlugin/hasPlugin
   utils/helperNode/     низкоуровневые DOM-хелперы (createText/insert/remove/…)
   jsx-runtime.ts        jsx/jsxs/Fragment + namespace JSX
   example/              basic.tsx, single.tsx, mixed.tsx
@@ -531,13 +667,15 @@ src/
 
 ---
 
-## 6. Состояние и что дальше
+## 7. Состояние и что дальше
 
 Сделано и покрыто тестами (`src/core/reactive/__tests__`, `src/runtime/__tests__`):
 оба режима, стык режимов, реактивные атрибуты, события, списки с `key`,
 `If`/`For`/`Component`, сигналы на строку в `For` (переиспользование, перестановка,
 удаление), размонтирование с гашением эффектов, SVG-неймспейс, объектные
-`class`/`style`, свойства форм, `ref`.
+`class`/`style`, свойства форм, `ref`. Плагины покрыты в
+`src/instance/__tests__` — установка, опции, дедупликация, изоляция ошибок,
+порядок хуков жизненного цикла, доступ из компонентов.
 
 Открытые места:
 
@@ -545,7 +683,7 @@ src/
 - Нет SSR/гидрации; нет `<Portal>`, `<Suspense>`, анимаций переходов.
 - Нет делегирования событий — слушатель вешается на каждый узел.
 
-## 7. Пакет и сборка
+## 8. Пакет и сборка
 
 Пакет называется `orve`, собирается в ESM (`"type": "module"`, `tsc` → `dist/`),
 относительные импорты в `src/` пишутся с расширением `.js` — как требует
@@ -562,7 +700,7 @@ ESM-резолвинг Node и `moduleResolution: nodenext`.
 дополнительно снимает `.js` с относительных импортов (`^(\.{1,2}/.*)\.js$`),
 потому что на диске лежат `.ts`, и компилирует тесты в CJS — сам раннер не ESM.
 
-## 8. Разработка
+## 9. Разработка
 
 ```bash
 pnpm dev          # Vite: playground/ в браузере, порт 5273
@@ -577,7 +715,7 @@ pnpm build        # tsc → dist/
 esbuild с `jsxImportSource: "orve"`. Свой `playground/tsconfig.json` нужен из-за
 `rootDir: src` в корневом конфиге.
 
-## 9. Соглашения
+## 10. Соглашения
 
 - Пропсы читаются только через `props.x` — см. предупреждение в разделе 2.
   В примерах и в `playground/` этот стиль соблюдается везде: любой `({ x })`
