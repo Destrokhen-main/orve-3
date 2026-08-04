@@ -93,8 +93,11 @@ export {
   EffectScope,
   effectScope,
   getCurrentScope,
+  getCurrentScopeHost,
   onScopeDispose,
+  runWithScopeHost,
 } from "./scope.js";
+export type { ScopeHost, Stoppable } from "./scope.js";
 export { getActiveEffect, untrack } from "./stack.js";
 export { VALUE_KEY } from "./types.js";
 export type { Reactive } from "./types.js";

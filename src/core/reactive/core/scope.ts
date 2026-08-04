@@ -2,21 +2,31 @@ export interface Stoppable {
   stop(): void;
 }
 
-let activeScope: EffectScope | null = null;
+/**
+ * Владелец области эффектов. Может отдать её, создав только в этот момент —
+ * так представление без единого эффекта (например, текстовый узел) вообще
+ * не платит за `EffectScope`.
+ */
+export interface ScopeHost {
+  resolveScope(): EffectScope;
+}
+
+let activeHost: ScopeHost | null = null;
 
 /**
  * Область владения эффектами. Всё реактивное, созданное внутри `run`,
  * автоматически регистрируется в области и умирает вместе с ней —
  * это точка интеграции с монтированием/размонтированием компонентов.
  */
-export class EffectScope implements Stoppable {
+export class EffectScope implements Stoppable, ScopeHost {
   private _active = true;
-  private items: Stoppable[] = [];
-  private cleanups: Array<() => void> = [];
+  /** Списки создаются по факту: пустая область не держит ни одного массива. */
+  private items: Stoppable[] | null = null;
+  private cleanups: Array<() => void> | null = null;
 
   constructor(detached = false) {
     if (!detached) {
-      activeScope?.add(this);
+      getCurrentScope()?.add(this);
     }
   }
 
@@ -24,20 +34,24 @@ export class EffectScope implements Stoppable {
     return this._active;
   }
 
+  resolveScope(): EffectScope {
+    return this;
+  }
+
   add(item: Stoppable) {
-    if (this._active) {
-      this.items.push(item);
-    } else {
+    if (!this._active) {
       item.stop();
+      return;
     }
+    (this.items ??= []).push(item);
   }
 
   addCleanup(fn: () => void) {
-    if (this._active) {
-      this.cleanups.push(fn);
-    } else {
+    if (!this._active) {
       fn();
+      return;
     }
+    (this.cleanups ??= []).push(fn);
   }
 
   run<T>(fn: () => T): T | undefined {
@@ -45,13 +59,7 @@ export class EffectScope implements Stoppable {
       return undefined;
     }
 
-    const prev = activeScope;
-    activeScope = this;
-    try {
-      return fn();
-    } finally {
-      activeScope = prev;
-    }
+    return runWithScopeHost(this, fn);
   }
 
   stop() {
@@ -62,11 +70,11 @@ export class EffectScope implements Stoppable {
 
     const items = this.items;
     const cleanups = this.cleanups;
-    this.items = [];
-    this.cleanups = [];
+    this.items = null;
+    this.cleanups = null;
 
-    items.forEach((item) => item.stop());
-    cleanups.forEach((fn) => fn());
+    items?.forEach((item) => item.stop());
+    cleanups?.forEach((fn) => fn());
   }
 }
 
@@ -75,11 +83,31 @@ export function effectScope(detached = false) {
   return new EffectScope(detached);
 }
 
-export function getCurrentScope() {
-  return activeScope;
+/**
+ * Текущая область. Обращение материализует ленивых владельцев по цепочке:
+ * спрашивают её только тогда, когда есть что в неё положить.
+ */
+export function getCurrentScope(): EffectScope | null {
+  return activeHost ? activeHost.resolveScope() : null;
+}
+
+/** Текущий владелец — без материализации области. */
+export function getCurrentScopeHost(): ScopeHost | null {
+  return activeHost;
+}
+
+/** Выполнить `fn`, сделав `host` текущим владельцем области. */
+export function runWithScopeHost<T>(host: ScopeHost | null, fn: () => T): T {
+  const prev = activeHost;
+  activeHost = host;
+  try {
+    return fn();
+  } finally {
+    activeHost = prev;
+  }
 }
 
 /** Зарегистрировать колбэк, который вызовется при остановке текущей области. */
 export function onScopeDispose(fn: () => void) {
-  activeScope?.addCleanup(fn);
+  getCurrentScope()?.addCleanup(fn);
 }

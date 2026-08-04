@@ -64,7 +64,7 @@ export class ComponentView extends BaseView {
 
     beginMount();
     try {
-      this.scope.run(() => {
+      this.runScoped(() => {
         this.props = new ReactiveProps(this.vnode.props);
 
         // setup не должен ничего трекать: это не реактивное вычисление.
@@ -94,7 +94,7 @@ export class ComponentView extends BaseView {
           // withContext нужен, чтобы дочерние компоненты в applyTree
           // находили правильную цепочку провайдеров при любом перерендере
           untrack(() =>
-            this.scope.run(() =>
+            this.runScoped(() =>
               withContext(this.ctx!, () => this.applyTree(next)),
             ),
           );

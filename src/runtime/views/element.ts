@@ -46,7 +46,7 @@ export class ElementView extends BaseView {
     this.ns = elementNS(tag, this.ns);
     this.el = createEl(tag, this.ns);
 
-    this.scope.run(() => {
+    this.runScoped(() => {
       for (const key of Object.keys(this.props)) {
         this.bindProp(key, this.props[key]);
       }
@@ -72,7 +72,7 @@ export class ElementView extends BaseView {
       return false;
     }
 
-    this.scope.run(() => {
+    this.runScoped(() => {
       this.patchProps(next.props);
 
       withNS(this.innerNS, () => {

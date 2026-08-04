@@ -24,7 +24,7 @@ export class FragmentView extends BaseView {
     this.anchor = createComment("");
     parent.insertBefore(this.anchor, anchor);
 
-    this.scope.run(() => {
+    this.runScoped(() => {
       withNS(this.ns, () => {
         this.children = this.source.map(createView);
         this.children.forEach((child) => child.mount(parent, this.anchor));
@@ -40,7 +40,7 @@ export class FragmentView extends BaseView {
       return false;
     }
 
-    this.scope.run(() => {
+    this.runScoped(() => {
       withNS(this.ns, () => {
         this.children = patchChildren(
           this.parentNode!,

@@ -13,8 +13,15 @@ export {
   effectScope,
   flushSync,
   getCurrentScope,
+  getCurrentScopeHost,
   nextTick,
   onScopeDispose,
+  runWithScopeHost,
   untrack,
 } from "./core/index.js";
-export type { EffectOptions, Reactive } from "./core/index.js";
+export type {
+  EffectOptions,
+  Reactive,
+  ScopeHost,
+  Stoppable,
+} from "./core/index.js";

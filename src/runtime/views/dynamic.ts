@@ -33,7 +33,7 @@ export class DynamicView extends BaseView {
     this.anchor = createComment("");
     parent.insertBefore(this.anchor, anchor);
 
-    this.scope.run(() => {
+    this.runScoped(() => {
       onScopeDispose(() => this.disposeCurrent());
 
       effect(() => {
