@@ -1,9 +1,11 @@
 import { ComponentView } from "../components/component";
+import { getCurrentContext } from "../instance/context";
 import {
   isPrimitiveChild,
   isSlot,
   isVNode,
   normalizeChildren,
+  readSlot,
   toText,
 } from "./jsx";
 import { Child, ComponentFn, FRAGMENT, View } from "./types";
@@ -39,6 +41,17 @@ export function createView(child: Child): View {
 
   // сигнал или тонк — сюда попадает только в сингл-режиме
   if (isSlot(child)) {
+    const ctx = getCurrentContext();
+    if (ctx && ctx.options.single !== true) {
+      console.warn(
+        "[orve] Сигнал передан как слот в базовом компоненте — " +
+          "такие подписки недопустимы без single. " +
+          "Используйте {signal.value} или добавьте defineOptions({ single: true }).",
+      );
+      // Fallback: читаем текущее значение, результат участвует в render-эффекте
+      return createView(readSlot(child));
+    }
+
     return new DynamicView(child);
   }
 
