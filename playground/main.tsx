@@ -14,9 +14,20 @@ import { store } from "./cases/Plugin/user.js";
 import { Comp } from "./cases/Components/Components.js";
 import { BaseRouter } from "./cases/BaseRouter/BaseRouter.js";
 import { router } from "./cases/BaseRouter/router.js";
+import { Lifecycle } from "./cases/Lifecycle/Lifecycle.js";
+import { Refs } from "./cases/Refs/Refs.js";
+import { Forms } from "./cases/Forms/Forms.js";
+import { ForStress } from "./cases/ForStress/ForStress.js";
+import { Svg } from "./cases/Svg/Svg.js";
+import { Events } from "./cases/Events/Events.js";
+import { SlotTypes } from "./cases/SlotTypes/SlotTypes.js";
+import { AsyncRace } from "./cases/AsyncRace/AsyncRace.js";
+import { Errors } from "./cases/Errors/Errors.js";
+import { Slots } from "./cases/Slots/Slots.js";
+import { Reactivity } from "./cases/Reactivity/Reactivity.js";
 
-const arrayComponent = [Basic, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Plugin, Async, Comp, BaseRouter];
-const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Plugin', 'With request', 'Components', 'BaseRouter'];
+const arrayComponent = [Basic, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Plugin, Async, Comp, BaseRouter, Lifecycle, Refs, Forms, ForStress, Svg, Events, SlotTypes, AsyncRace, Errors, Slots, Reactivity];
+const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Plugin', 'With request', 'Components', 'BaseRouter', 'Lifecycle', 'Refs', 'Forms', 'For stress', 'SVG', 'Events', 'Slot types', 'Async race', 'Errors', 'Slots', 'Reactivity'];
 
 const debugPage = null;
 

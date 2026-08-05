@@ -92,3 +92,48 @@ ul {
   border: 1px solid black;
   font-size: 12px;
 }
+/* ── общие классы для кейсов ─────────────────────────────────────────── */
+
+.pane {
+  padding: 0.6rem 0.8rem;
+  margin: 0.5rem 0;
+  border: 1px dashed color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 0.4rem;
+}
+
+.log {
+  max-height: 14rem;
+  overflow: auto;
+  font-size: 0.85rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.scroll {
+  max-height: 12rem;
+  overflow: auto;
+}
+
+.cols {
+  display: flex;
+  gap: 1rem;
+}
+
+.cols > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.dim {
+  opacity: 0.6;
+}
+
+h3 {
+  margin: 1rem 0 0.4rem;
+  font-size: 0.95rem;
+}
+
+pre {
+  margin: 0;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+}
