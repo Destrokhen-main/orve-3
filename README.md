@@ -129,6 +129,8 @@ const Badge = (props: { text: string }) => () => <div>{props.text}</div>;
 Это касается и `{ ...props }`, и `Object.assign`, и передачи `props` в функцию,
 которая разбирает его внутри. `props.a.b` читать можно.
 
+Если пропсы нужно передать дальше целиком — есть `forwardProps` (см. ниже).
+
 Наружу можно передавать и значение, и сигнал — внутри компонента `props.x`
 всегда обычное значение:
 
@@ -153,6 +155,37 @@ const Widget = () => {
 
 Вызывать только в `setup`. `onMounted` срабатывает ровно один раз за жизнь
 инстанса, дети — раньше родителей.
+
+### Проброс пропсов: `forwardProps`
+
+Обёртка, которая принимает пропсы и отдаёт их дальше — в другой компонент, в тег
+или в `jsx(...)` — не может ни разложить `props`, ни сделать `{ ...props }`.
+Для этого есть `forwardProps`: плоская копия пропсов с возможностью выкинуть
+служебные ключи.
+
+```tsx
+import { forwardProps, jsx } from "orve";
+
+const Layout = (props: { is: ComponentFn; title: string }) => {
+  // ❗ только внутри render — здесь читаются значения пропсов
+  return () => jsx(props.is, forwardProps(props, ["is"]));
+};
+```
+
+```ts
+forwardProps(props, skip?)   // skip — массив ключей, которые не копируются
+```
+
+- **Вызывать только в render или в тонке, никогда в `setup`.** `forwardProps`
+  читает значения пропсов; сделанная в `setup` копия снимется один раз и
+  застынет — ровно как обычная деструктуризация.
+- В render это безопасно: чтение подписывает render (или тонк) на все
+  скопированные пропсы, поэтому при изменении любого из них копия пересоберётся.
+  Ключи из `skip` не читаются — подписки на них не будет.
+- Копия плоская и по значению; ребёнок получает обычные пропсы, его `setup` от
+  этого не перезапускается.
+
+Так устроен и встроенный `<Component>`: он отдаёт вниз `forwardProps(props, ["is"])`.
 
 ---
 
@@ -416,7 +449,7 @@ instance.unmount();
 - Реактивность: `state`, `computed`, `watch`, `effect`, `untrack`, `effectScope`,
   `getCurrentScope`, `onScopeDispose`, `nextTick`, `flushSync`
 - Компоненты: `onMounted`, `onBeforeUnmounted`, `onUnmounted`, `defineOptions`,
-  `provide`, `inject`
+  `provide`, `inject`, `forwardProps`
 - Встроенные: `If`, `For`, `Component`
 - Инстанс и плагины: `createInstance`, `usePlugins`, `usePlugin`, `requirePlugin`,
   `hasPlugin`
