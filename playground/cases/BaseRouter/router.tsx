@@ -1,4 +1,4 @@
-import { Component, ComponentFn, computed, defineOptions, DynamicTarget, jsx, OrvePluginType, Props, requirePlugin, State, state, VNode } from "orve";
+import { Component, ComponentFn, computed, defineOptions, DynamicTarget, forwardProps, jsx, OrvePluginType, Props, requirePlugin, State, state, VNode } from "orve";
 
 type Route = {
   name: string,
@@ -64,7 +64,7 @@ function changeURl(state: keyof History = "pushState", path: string) {
 function createRouter(routers: Route[], mode: 'hash' | 'history' = 'history'): OrvePluginType {
   ROUTER.allRouter = routers;
   ROUTER.mode = mode;
-  
+
   const ready = worker();
 
   if (ready) {
@@ -83,16 +83,6 @@ function createRouter(routers: Route[], mode: 'hash' | 'history' = 'history'): O
   }
 }
 
-function forward(props: Props): Props {
-  const forwarded: Props = {};
-
-  for (const key of Object.keys(props)) {
-    forwarded[key] = props[key];
-  }
-
-  return forwarded;
-}
-
 export const RouterLink: ComponentFn = (props) => {
   const router = requirePlugin('$router') as any;
   const currentRoute = router.currentRoute() as State<Route | null>;
@@ -102,7 +92,7 @@ export const RouterLink: ComponentFn = (props) => {
     if (!component) {
       return null;
     }
-    return jsx(component as ComponentFn<any>, forward(props))
+    return jsx(component as ComponentFn<any>, forwardProps(props))
   }
 }
 

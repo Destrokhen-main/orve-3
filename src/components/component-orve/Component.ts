@@ -1,4 +1,4 @@
-import { defineOptions } from "../../index.js";
+import { defineOptions, forwardProps } from "../../index.js";
 import type { Computed, State } from "../../core/reactive/index.js";
 import { getCurrentContext } from "../../instance/context/index.js";
 import { isVNode, jsx } from "../../runtime/jsx.js";
@@ -30,20 +30,6 @@ export type ComponentProps = {
   /** Остальное уезжает внутрь `is`; проверить его типами нельзя — цель динамическая. */
   [prop: string]: unknown;
 };
-
-/** Все пропы, кроме служебного `is`, уезжают внутрь как есть. */
-function forward(props: Props): Props {
-  const forwarded: Props = {};
-
-  for (const key of Object.keys(props)) {
-    if (key === "is") {
-      continue;
-    }
-    forwarded[key] = props[key];
-  }
-
-  return forwarded;
-}
 
 /**
  * Динамический компонент: что рендерить, решает проп `is`, и он может меняться.
@@ -79,7 +65,7 @@ const Dynamic = (props: ComponentProps) => {
       return null;
     }
 
-    const forwarded = forward(props);
+    const forwarded = forwardProps(props, ["is"]);
 
     // готовый узел: дорисовываем к нему пропсы, если они есть
     if (isVNode(target)) {

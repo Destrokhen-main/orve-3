@@ -76,3 +76,5 @@ export type {
   EventProp,
   IntrinsicProps,
 } from "./runtime/jsx-attributes.js";
+
+export { forwardProps } from "./utils/forwardProps.js";
