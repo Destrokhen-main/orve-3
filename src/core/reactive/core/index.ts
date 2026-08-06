@@ -85,5 +85,6 @@ export {
 } from "./scope.js";
 export type { ScopeHost, Stoppable } from "./scope.js";
 export { getActiveEffect, untrack } from "./stack.js";
+export { readDep } from "./deps.js";
 export { VALUE_KEY } from "./types.js";
-export type { Reactive } from "./types.js";
+export type { DepSource, Reactive } from "./types.js";

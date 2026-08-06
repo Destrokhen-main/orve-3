@@ -1,4 +1,4 @@
-import { core, Effect, untrack } from "../core/index.js";
+import { core, Effect, readDep, untrack } from "../core/index.js";
 import { ComputedOptions } from "./types.js";
 
 export class Computed<T> {
@@ -12,7 +12,7 @@ export class Computed<T> {
     const compute: () => T = deps
       ? () => {
           // читаем только объявленные зависимости, само вычисление — без трекинга
-          deps.forEach((dep) => dep.value);
+          deps.forEach((dep) => readDep(dep));
           return untrack(callBack);
         }
       : callBack;

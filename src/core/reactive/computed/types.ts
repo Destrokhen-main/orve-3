@@ -1,9 +1,13 @@
-import type { Reactive } from "../core/types.js";
+import type { DepSource } from "../core/types.js";
 
 export type ComputedOptions = {
   /**
    * Явный список зависимостей. Если задан — авто-трекинг внутри вычисления
    * отключается, computed пересчитывается только при изменении этих источников.
+   *
+   * Источником может быть `State`/`Computed`, объект от `reactive()` (тогда
+   * подписка идёт на всё его содержимое вглубь) или геттер `() => store.a.b`,
+   * если из объекта нужна конкретная ветка.
    */
-  deps: Reactive[];
+  deps: DepSource[];
 };

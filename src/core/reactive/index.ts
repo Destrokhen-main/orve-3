@@ -27,6 +27,7 @@ export {
   untrack,
 } from "./core/index.js";
 export type {
+  DepSource,
   EffectOptions,
   Reactive,
   ScopeHost,

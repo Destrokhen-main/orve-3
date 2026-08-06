@@ -21,6 +21,7 @@ export {
 } from "./core/reactive/index.js";
 export type {
   ComputedOptions,
+  DepSource,
   EffectOptions,
   OptionsWatch,
   Reactive,

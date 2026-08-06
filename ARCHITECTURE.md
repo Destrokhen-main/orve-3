@@ -31,7 +31,8 @@ reactive<T extends object>(target) -> T   // глубокий прокси: по
 computed<T>(fn, options?) -> Computed<T>
   .value        // ленивое вычисление: пересчёт на чтении, если помечен грязным
   .peek() / .stop()
-  ComputedOptions.deps: Reactive[]   // явные зависимости вместо авто-трекинга
+  ComputedOptions.deps: DepSource[]  // явные зависимости вместо авто-трекинга
+  // DepSource = State | Computed | объект от reactive() (обход вглубь) | геттер
 
 watch(cb, deps, options?) -> Watch
   .un() / .pause() / .resume()       // изменения во время паузы догоняются одним вызовом

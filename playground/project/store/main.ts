@@ -1,4 +1,4 @@
-import { Computed, computed, inject, provide, state } from "orve";
+import { Computed, computed, inject, provide, reactive, state } from "orve";
 import { Message, User } from "../types/types";
 
 const STORE_KEY = Symbol('orve-message');
@@ -12,14 +12,14 @@ export type Store = {
 }
 
 export function setupStore() {
-  const users = state<User[]>([{
+  const users = reactive<User[]>([{
     id: '1',
     name: 'YOU',
   },{
     id: '2',
     name: 'Jamme'
   }]);
-  const message = state<Message[]>([
+  const message = reactive<Message[]>([
     {
       id: '1',
       message: 'HELLO',
@@ -35,17 +35,17 @@ export function setupStore() {
   ]);
 
   const addMessage = (userId: string, body: string) => {
-    message.set((v) => [...v, {
+    message.push({
       id: String(Math.random()),
       userId,
       message: body,
       data: '123',
-    }])
+    })
   }
 
   const messageWithUser = computed(() => {
-    return message.value.map((mess) => {
-      const user = users.value.find((user) => user.id === mess.userId);
+    return message.map((mess) => {
+      const user = users.find((user) => user.id === mess.userId);
       return {
         ...mess,
         user: user,
@@ -56,8 +56,8 @@ export function setupStore() {
   })
 
   provide(STORE_KEY, {
-    users: computed(() => users.value),
-    messages: computed(() => message.value),
+    users: computed(() => users),
+    messages: computed(() => message),
     messageWithUser,
     addMessage,
     myId: '1',

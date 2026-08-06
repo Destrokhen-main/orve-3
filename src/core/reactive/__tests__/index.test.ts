@@ -1,5 +1,6 @@
 import { computed } from "../computed/index.js";
 import { effect, nextTick } from "../core/index.js";
+import { reactive } from "../reactive/index.js";
 import { state } from "../state/index.js";
 
 describe("reactive", () => {
@@ -157,6 +158,104 @@ describe("reactive", () => {
       b.set(b.value + 1);
       await nextTick();
       expect(fn).toHaveBeenCalledTimes(1);
+    });
+
+    describe("deps с reactive()", () => {
+      it("реактивный объект в deps будит пересчёт", async () => {
+        const store = reactive({ a: 1, b: 2 });
+
+        const fn = jest.fn(() => store.a + store.b);
+        const c = computed(fn, { deps: [store] });
+
+        expect(c.value).toBe(3);
+        expect(fn).toHaveBeenCalledTimes(1);
+
+        store.b = 10;
+        await nextTick();
+        expect(c.value).toBe(11);
+        expect(fn).toHaveBeenCalledTimes(2);
+      });
+
+      it("подписка идёт вглубь, включая массивы и новые ключи", async () => {
+        const store = reactive({ user: { name: "аня" }, tags: ["a"] });
+
+        const fn = jest.fn(
+          () => `${store.user.name}:${store.tags.join(",")}`,
+        );
+        const c = computed(fn, { deps: [store] });
+
+        expect(c.value).toBe("аня:a");
+
+        store.user.name = "оля";
+        await nextTick();
+        expect(c.value).toBe("оля:a");
+
+        store.tags.push("b");
+        await nextTick();
+        expect(c.value).toBe("оля:a,b");
+        expect(fn).toHaveBeenCalledTimes(3);
+      });
+
+      it("циклическая ссылка не зацикливает обход", () => {
+        const store: any = reactive({ a: 1 });
+        store.self = store;
+
+        const c = computed(() => store.a, { deps: [store] });
+        expect(c.value).toBe(1);
+      });
+
+      it("Map в deps: изменение содержимого инвалидирует", async () => {
+        const store = reactive(new Map<string, number>([["a", 1]]));
+
+        const fn = jest.fn(() => store.get("a") ?? 0);
+        const c = computed(fn, { deps: [store] });
+
+        expect(c.value).toBe(1);
+
+        store.set("a", 5);
+        await nextTick();
+        expect(c.value).toBe(5);
+        expect(fn).toHaveBeenCalledTimes(2);
+      });
+
+      it("геттер в deps сужает подписку до одной ветки", async () => {
+        const store = reactive({ a: 1, b: 2 });
+
+        const fn = jest.fn(() => store.a + store.b);
+        const c = computed(fn, { deps: [() => store.a] });
+
+        expect(c.value).toBe(3);
+
+        // b не в deps — пересчёта нет
+        store.b = 10;
+        await nextTick();
+        expect(c.value).toBe(3);
+        expect(fn).toHaveBeenCalledTimes(1);
+
+        store.a = 2;
+        await nextTick();
+        expect(c.value).toBe(12);
+        expect(fn).toHaveBeenCalledTimes(2);
+      });
+
+      it("State и reactive можно смешивать в одном списке", async () => {
+        const flag = state(false);
+        const store = reactive({ a: 1 });
+
+        const fn = jest.fn(() => (flag.value ? store.a : 0));
+        const c = computed(fn, { deps: [flag, store] });
+
+        expect(c.value).toBe(0);
+
+        store.a = 7;
+        await nextTick();
+        expect(c.value).toBe(0);
+        expect(fn).toHaveBeenCalledTimes(2);
+
+        flag.set(true);
+        await nextTick();
+        expect(c.value).toBe(7);
+      });
     });
   });
 });
