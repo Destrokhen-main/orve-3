@@ -7,10 +7,15 @@ import { VALUE_KEY } from "./types.js";
 const legacyEffects = new WeakMap<() => void, Effect<unknown>>();
 
 class Core {
-  private targetMap = new WeakMap<object, Map<string, Set<Effect<any>>>>();
+  private targetMap = new WeakMap<object, Map<unknown, Set<Effect<any>>>>();
 
-  /** Подписать активный эффект на `target[key]`. Повторный вызов ничего не дублирует. */
-  track(target: object, key: string = VALUE_KEY) {
+  /**
+   * Подписать активный эффект на `target[key]`. Повторный вызов ничего не дублирует.
+   *
+   * Ключ — `unknown`, а не `string`: `reactive()` трекает свойства по их
+   * настоящим ключам, а у `Map` ключом может быть что угодно.
+   */
+  track(target: object, key: unknown = VALUE_KEY) {
     const effect = getActiveEffect();
     if (!effect || !effect.active) {
       return;
@@ -35,7 +40,7 @@ class Core {
     }
   }
 
-  trigger(target: object, key: string = VALUE_KEY) {
+  trigger(target: object, key: unknown = VALUE_KEY) {
     const dep = this.targetMap.get(target)?.get(key);
     if (!dep || dep.size === 0) {
       return;

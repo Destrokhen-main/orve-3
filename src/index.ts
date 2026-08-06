@@ -9,9 +9,13 @@ export {
   effectScope,
   flushSync,
   getCurrentScope,
+  isReactive,
+  markRaw,
   nextTick,
   onScopeDispose,
+  reactive,
   state,
+  toRaw,
   untrack,
   watch,
 } from "./core/reactive/index.js";

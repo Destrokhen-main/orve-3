@@ -23,9 +23,11 @@ import { AsyncRace } from "./cases/AsyncRace/AsyncRace.js";
 import { Errors } from "./cases/Errors/Errors.js";
 import { Slots } from "./cases/Slots/Slots.js";
 import { Reactivity } from "./cases/Reactivity/Reactivity.js";
+import { Reactive } from "./cases/Reactive/Reactive.js";
+import { ReactiveSingle } from "./cases/Reactive/ReactiveSingle.js";
 
-const arrayComponent = [Basic, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Plugin, Async, Comp, BaseRouter, Lifecycle, Refs, Forms, ForStress, Svg, Events, SlotTypes, AsyncRace, Errors, Slots, Reactivity];
-const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Plugin', 'With request', 'Components', 'BaseRouter', 'Lifecycle', 'Refs', 'Forms', 'For stress', 'SVG', 'Events', 'Slot types', 'Async race', 'Errors', 'Slots', 'Reactivity'];
+const arrayComponent = [Basic, PropsDrilling, Styles, Classes, AsyncCase, Tree, ProvideInject, Todo, Plugin, Async, Comp, BaseRouter, Lifecycle, Refs, Forms, ForStress, Svg, Events, SlotTypes, AsyncRace, Errors, Slots, Reactivity, Reactive, ReactiveSingle];
+const arrayButton = ['BASIC', 'Input', 'Styles', 'Classes', 'Async', 'Tree', 'Provide/Inject', 'TODO', 'Plugin', 'With request', 'Components', 'BaseRouter', 'Lifecycle', 'Refs', 'Forms', 'For stress', 'SVG', 'Events', 'Slot types', 'Async race', 'Errors', 'Slots', 'Reactivity', 'Reactive', 'Reactive single'];
 
 const debugPage = null;
 

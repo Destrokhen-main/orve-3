@@ -22,6 +22,12 @@ state<T>(value, options?) -> State<T>
   .set(v)       // значение либо апдейтер: set(v => v + 1)
   StateOptions.equals: false | ((old, next) => boolean)   // по умолчанию Object.is
 
+reactive<T extends object>(target) -> T   // глубокий прокси: подписка по свойствам
+  toRaw(value)      // исходный объект из-под прокси
+  markRaw(obj)      // никогда не оборачивать
+  isReactive(value)
+  // объекты, массивы, Map/Set/WeakMap/WeakSet; Date/RegExp/DOM/frozen — как есть
+
 computed<T>(fn, options?) -> Computed<T>
   .value        // ленивое вычисление: пересчёт на чтении, если помечен грязным
   .peek() / .stop()
@@ -58,10 +64,20 @@ flushSync()                           // синхронно разобрать �
    Текущая область спрятана за `ScopeHost`: `getCurrentScope()` спрашивают
    только когда есть что положить, поэтому владельцы могут создавать области
    лениво (`runWithScopeHost`).
+8. **`reactive()` — тот же трекинг, но по ключам** (`reactive/`). `State`
+   трекает себя под одним ключом `VALUE_KEY`; прокси трекает `target[key]` на
+   `get`/`has`/`ownKeys` и триггерит на `set`/`delete`. Отдельный `ITERATE_KEY`
+   отвечает за состав ключей (`for...in`, `Object.keys`, `size`, итерация).
+   Обёртки лениво создаются на чтении и кешируются в `WeakMap`, поэтому
+   `store.nested === store.nested`. В сырое дерево кладутся сырые значения:
+   прокси в состоянии не накапливаются. Мутирующие методы массива вызываются
+   внутри `untrack`, иначе `arr.push()` в эффекте подписал бы его на `length`,
+   который он же и меняет.
 
 Файлы: `core/index.ts` (track/trigger, `effect`), `core/effect.ts`,
 `core/scheduler.ts`, `core/stack.ts`, `core/scope.ts`, `state/`, `computed/`,
-`watch/`.
+`watch/`, `reactive/` (`index.ts` — базовые трапы, `collections.ts` — Map/Set,
+`shared.ts` — символы, кеш, `toRaw`/`markRaw`).
 
 ---
 
@@ -676,6 +692,7 @@ instance.unmount();
 ```
 src/
   core/reactive/        ядро: state, computed, watch, effect, scope, scheduler
+                        reactive/ — глубокий прокси (reactive/toRaw/markRaw)
   core/utlils/          getType (опечатка в имени папки — историческая)
   runtime/
     types.ts            VNode, Child, Slot, View, ComponentFn
@@ -715,7 +732,8 @@ src/
 оба режима, стык режимов, реактивные атрибуты, события, списки с `key`,
 `If`/`For`/`Component`, сигналы на строку в `For` (переиспользование, перестановка,
 удаление), размонтирование с гашением эффектов, SVG-неймспейс, объектные
-`class`/`style`, свойства форм, `ref`. Плагины покрыты в
+`class`/`style`, свойства форм, `ref`, глубокий `reactive()` (объекты, массивы,
+Map/Set, идентичность обёрток, `toRaw`/`markRaw`). Плагины покрыты в
 `src/instance/__tests__` — установка, опции, дедупликация, изоляция ошибок,
 порядок хуков жизненного цикла, доступ из компонентов.
 
