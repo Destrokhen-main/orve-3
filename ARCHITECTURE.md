@@ -693,7 +693,6 @@ instance.unmount();
 src/
   core/reactive/        ядро: state, computed, watch, effect, scope, scheduler
                         reactive/ — глубокий прокси (reactive/toRaw/markRaw)
-  core/utlils/          getType (опечатка в имени папки — историческая)
   runtime/
     types.ts            VNode, Child, Slot, View, ComponentFn
     jsx.ts              фабрика + предикаты (isVNode/isSlot/readSlot/…)
@@ -705,14 +704,12 @@ src/
   components/
     component/          ReactiveProps, ComponentView, хуки жизненного цикла
     component-orve/     If, For, Component — управляющие компоненты для сингла
-    element/, text/, fragment/   пустые заготовки, вытеснены runtime/views
   instance/
     index.ts            OrveInstance: use, rootComponent, mountRoot, unmount
     context/
       context.ts        ContextType, стек контекстов (push/pop/get/with/create)
       provider/         provide(), inject()
       defines/          defineOptions()
-      utils/            isContextAvailable
     plugins/
       types.ts          OrvePlugins, PluginContext, PluginApi, OrvePluginInput
       plugins.ts        OrvePlugin — изоляция одного плагина, его хуки
@@ -721,7 +718,8 @@ src/
   utils/helperNode/     низкоуровневые DOM-хелперы (createText/insert/remove/…)
   utils/forwardProps.ts forwardProps — копия пропсов для проброса дальше
   jsx-runtime.ts        jsx/jsxs/Fragment + namespace JSX
-  example/              basic.tsx, single.tsx, mixed.tsx
+  jsx-dev-runtime.ts    dev-вариант того же рантайма
+  index.ts              публичный API пакета
 ```
 
 ---
