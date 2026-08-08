@@ -5,8 +5,9 @@ import { store } from "./cases/Plugin/user";
 
 // Main - простой кейс чата
 // import { Main } from "./project/main";
-import { Training } from "./traning/main";
+// import { Training } from "./traning/main";
+// Training;
 
-const INSTANCE = Training;// App;// Main // App
+const INSTANCE = App;// Main // App
 
 createInstance().use(store).use(router).rootComponent(INSTANCE).mountRoot("#app");
