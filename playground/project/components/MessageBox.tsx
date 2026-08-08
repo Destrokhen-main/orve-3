@@ -1,5 +1,5 @@
-import { defineOptions, For, inject } from "orve"
-import { Store, useStore } from "../store/main"
+import { defineOptions, For } from "orve"
+import { useStore } from "../store/main"
 
 export const MessageBox = () => {
   defineOptions({
@@ -7,7 +7,6 @@ export const MessageBox = () => {
   })
 
   const context = useStore();
-
 
   return () => (
     <div class="message-box">

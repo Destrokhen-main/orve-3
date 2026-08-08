@@ -3,15 +3,13 @@ import './style.css';
 
 import { InputBox } from './components/Input';
 import { MessageBox } from './components/MessageBox';
-import { setupStore } from './store/main';
+import { LayoutStore } from './store/main';
 
 export const Main = () => {
-  setupStore();
-
   return () => (
-    <div>
+    <LayoutStore>
       <MessageBox />
       <InputBox />
-    </div>
+    </LayoutStore>
   )
 }

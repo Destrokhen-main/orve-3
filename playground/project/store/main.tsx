@@ -1,4 +1,4 @@
-import { Computed, computed, inject, provide, reactive, state } from "orve";
+import { ComponentFn, Computed, computed, defineOptions, inject, provide, reactive, state } from "orve";
 import { Message, User } from "../types/types";
 
 const STORE_KEY = Symbol('orve-message');
@@ -66,4 +66,13 @@ export function setupStore() {
 
 export function useStore() {
   return inject<Store>(STORE_KEY);
+}
+
+export const LayoutStore: ComponentFn = (props) => {
+  defineOptions({
+    single:true
+  })
+  setupStore();
+
+  return () => <>{props.children}</>
 }
