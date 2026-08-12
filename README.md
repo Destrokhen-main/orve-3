@@ -70,6 +70,7 @@ import { state, computed, watch, effect, untrack, nextTick } from "orve";
 
 const count = state(0);
 count.value;              // чтение с подпиской
+count.get();              // то же самое, вызовом
 count.peek();             // чтение без подписки
 count.set(5);             // запись
 count.set((v) => v + 1);  // запись через апдейтер
@@ -82,6 +83,37 @@ effect(() => console.log(count.value));          // авто-трекинг, з�
 untrack(() => count.value);   // прочитать, не подписываясь
 await nextTick();             // дождаться, пока применятся обновления
 ```
+
+### `get()` — чтение с преобразованием
+
+`get()` — это `.value`, только вызовом. А если передать функцию, она получит
+текущее значение и вернёт то, что нужно в этом месте:
+
+```ts
+const status = state<"foo" | "baz">("foo");
+
+status.get();                                   // "foo" | "baz"
+status.get((v) => v === "foo");                 // boolean
+status.get((v) => (v === "foo" ? bar : qwer));  // typeof bar | typeof qwer
+```
+
+Выходной тип выводится из вашей функции, поэтому результат остаётся
+типизированным и с ним удобно работать дальше:
+
+```tsx
+const user = state({ name: "аня", admin: false });
+
+<span class={() => user.get((u) => (u.admin ? "badge badge--admin" : "badge"))}>
+  {() => user.get((u) => u.name.toUpperCase())}
+</span>
+```
+
+- функция обязана вернуть значение на всех ветках — иначе в тип попадёт
+  `undefined`, и TS об этом скажет;
+- подписка встаёт на само состояние: функция — просто преобразование
+  прочитанного;
+- результат не кешируется, функция считается на каждом чтении. Нужен ленивый
+  общий пересчёт — берите `computed`.
 
 ### `reactive()` — мутации по месту
 

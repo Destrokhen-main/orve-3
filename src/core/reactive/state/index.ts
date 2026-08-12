@@ -19,6 +19,22 @@ export class State<T> {
     this.set(newValue);
   }
 
+  /**
+   * Частный случай `value`: читает значение с подпиской и, если передана
+   * функция-преобразователь, возвращает её результат.
+   *
+   * Выходной тип выводится из `fn`, поэтому `get((v) => v.length)` — `number`.
+   */
+  get(): T;
+  get<R>(fn: (v: T) => R): R;
+  get<R>(fn?: (v: T) => R): T | R {
+    const v = this.value;
+    if (fn) {
+      return fn(v);
+    }
+    return v;
+  }
+
   /** Прочитать без подписки текущего эффекта. */
   peek(): T {
     return this._value;
