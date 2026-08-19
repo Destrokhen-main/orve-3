@@ -65,21 +65,73 @@ export function isInternalProp(key: string) {
   return key === "children" || key === "key" || key === "ref";
 }
 
-/** `onClickCapture` → событие `click` в фазе перехвата. */
+/**
+ * Приписки к имени обработчика: `onClick:stop={fn}`, несколько — через дефис,
+ * `onClick:stop-prevent`. Двоеточие, а не точка: JSX разрешает в имени атрибута
+ * только идентификатор или `namespace:name`.
+ */
+const EVENT_MODIFIERS = new Set(["stop", "prevent"]);
+
+export type EventModifier = "stop" | "prevent";
+
+/**
+ * `onClickCapture` → событие `click` в фазе перехвата.
+ * `onClick:stop-prevent` → тот же `click` плюс список приписок.
+ */
 export function parseEvent(key: string) {
-  const capture = key.endsWith("Capture");
-  const name = (capture ? key.slice(2, -7) : key.slice(2)).toLowerCase();
-  return { name, capture };
+  const [base, mods] = key.split(":");
+  const capture = base.endsWith("Capture");
+  const name = (capture ? base.slice(2, -7) : base.slice(2)).toLowerCase();
+  const modifiers = (mods ? mods.split("-") : []).filter((mod) =>
+    EVENT_MODIFIERS.has(mod),
+  ) as EventModifier[];
+  return { name, capture, modifiers };
 }
 
 export type EventValue =
   | EventListener
   | [EventListener, AddEventListenerOptions | boolean];
 
-export function addListener(el: Element, key: string, value: EventValue) {
-  const { name, capture } = parseEvent(key);
+/** Приписки срабатывают до колбека — он уже получает обработанное событие. */
+function withModifiers(
+  handler: EventListener,
+  modifiers: EventModifier[],
+): EventListener {
+  return function (this: unknown, event: Event) {
+    if (modifiers.includes("prevent")) {
+      event.preventDefault();
+    }
+    if (modifiers.includes("stop")) {
+      event.stopPropagation();
+    }
+    handler.call(this, event);
+  };
+}
+
+/**
+ * Возвращает то, что реально повешено на узел: с приписками это обёртка,
+ * и снимать потом надо именно её.
+ */
+export function addListener(
+  el: Element,
+  key: string,
+  value: EventValue,
+): EventValue {
+  const { name, capture, modifiers } = parseEvent(key);
   const [handler, options] = Array.isArray(value) ? value : [value, undefined];
-  el.addEventListener(name, handler, options ?? capture);
+
+  const bound =
+    modifiers.length && typeof handler === "function"
+      ? withModifiers(handler, modifiers)
+      : handler;
+
+  el.addEventListener(name, bound, options ?? capture);
+
+  if (bound === handler) {
+    return value;
+  }
+
+  return Array.isArray(value) ? [bound, options!] : bound;
 }
 
 export function removeListener(el: Element, key: string, value: EventValue) {

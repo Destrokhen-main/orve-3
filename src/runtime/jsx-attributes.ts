@@ -82,13 +82,25 @@ export type EventProp<Ev, El> =
   | [EventHandler<Ev, El>, AddEventListenerOptions | boolean];
 
 /**
+ * Приписки к имени обработчика — их снимает `parseEvent` и выполняет до колбека:
+ * `:prevent` → `preventDefault`, `:stop` → `stopPropagation`.
+ */
+type EventModifiers =
+  | ""
+  | ":stop"
+  | ":prevent"
+  | ":stop-prevent"
+  | ":prevent-stop";
+
+/**
  * `click` → `onClick` / `onClickCapture`. Имена совпадают с тем, что разбирает
- * `parseEvent`: он просто снимает `on`, суффикс `Capture` и опускает регистр.
+ * `parseEvent`: он просто снимает `on`, суффикс `Capture`, приписки и опускает
+ * регистр.
  */
 type EventAttributes<El, Map> = {
   [K in keyof Map & string as
-    | `on${Capitalize<K>}`
-    | `on${Capitalize<K>}Capture`]?: EventProp<Map[K], El>;
+    | `on${Capitalize<K>}${EventModifiers}`
+    | `on${Capitalize<K>}Capture${EventModifiers}`]?: EventProp<Map[K], El>;
 };
 
 /* ─────────────────────────── атрибуты из lib.dom ───────────────────────── */

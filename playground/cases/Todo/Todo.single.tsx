@@ -29,7 +29,7 @@ const Form = ({ createTodo }: { createTodo: (name: string) => void }) => {
         when={() => errorMessage.value !== null}
         then={() => <i style="color: red">{errorMessage.value}</i>}
       />
-      <form onSubmit={(e: SubmitEvent) => { e.preventDefault(); save() }}>
+      <form onSubmit:prevent={(e: SubmitEvent) => { save() }}>
         <input value={name} onInput={(e: any) => name.set(e.target.value)} placeholder="name" />
         <br />
         <button>Add</button>

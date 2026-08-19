@@ -122,8 +122,10 @@ export class ElementView extends BaseView {
 
     if (isEventProp(key)) {
       if (typeof value === "function" || Array.isArray(value)) {
-        addListener(this.el!, key, value as EventValue);
-        this.listeners.set(key, value as EventValue);
+        // с приписками (`onClick.stop`) на узел уходит обёртка — храним её,
+        // снимать надо ровно тот же слушатель
+        const bound = addListener(this.el!, key, value as EventValue);
+        this.listeners.set(key, bound);
       }
       return;
     }

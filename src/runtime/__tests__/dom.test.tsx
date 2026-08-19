@@ -249,6 +249,97 @@ describe("DOM-слой", () => {
 
       expect(handler).toHaveBeenCalledTimes(0);
     });
+
+    it(":prevent отменяет действие по умолчанию до колбека", () => {
+      let preventedInside = false;
+      const App = () => () => (
+        <a
+          href="#target"
+          onClick:prevent={(event) => {
+            preventedInside = event.defaultPrevented;
+          }}
+        >
+          ok
+        </a>
+      );
+
+      const { app } = mount(App);
+      const link = app.querySelector("a")!;
+      const event = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+      });
+      link.dispatchEvent(event);
+
+      expect(preventedInside).toBe(true);
+      expect(event.defaultPrevented).toBe(true);
+    });
+
+    it(":stop не пускает событие к родителю", () => {
+      const order: string[] = [];
+      const App = () => () => (
+        <div onClick={() => order.push("родитель")}>
+          <button onClick:stop={() => order.push("кнопка")}>ok</button>
+        </div>
+      );
+
+      const { app } = mount(App);
+      app.querySelector("button")!.click();
+
+      expect(order).toStrictEqual(["кнопка"]);
+    });
+
+    it("совмещает приписки и опции слушателя", () => {
+      const handler = jest.fn();
+      const App = () => () => (
+        <button onClick:stop-prevent={[handler, { once: true }]}>ok</button>
+      );
+
+      const { app } = mount(App);
+      const button = app.querySelector("button")!;
+      const first = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+      });
+      button.dispatchEvent(first);
+      button.click();
+
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(first.defaultPrevented).toBe(true);
+    });
+
+    it("снимает обёртку с приписками при размонтировании", () => {
+      const handler = jest.fn();
+      const App = () => () => <button onClick:stop={handler}>ok</button>;
+
+      const { app, instance } = mount(App);
+      const button = app.querySelector("button")!;
+      instance.unmount();
+      button.click();
+
+      expect(handler).toHaveBeenCalledTimes(0);
+    });
+
+    it("снимает старую обёртку при замене обработчика с припиской", async () => {
+      const first = jest.fn();
+      const second = jest.fn();
+      const flag = state(true);
+
+      const App = () => () => (
+        <button onClick:stop={flag.value ? first : second}>ok</button>
+      );
+
+      const { app } = mount(App);
+      const button = app.querySelector("button")!;
+      button.click();
+
+      flag.set(false);
+      await nextTick();
+      button.click();
+
+      expect(first).toHaveBeenCalledTimes(1);
+      expect(second).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("ref", () => {
