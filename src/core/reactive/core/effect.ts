@@ -30,6 +30,12 @@ export class Effect<T = unknown> implements Stoppable {
     private options: EffectOptions = {},
   ) {
     this.job = () => {
+      // очередь забирается снимком, поэтому `stop()` во время текущего прохода
+      // уже не успевает вынуть задачу — проверяем здесь
+      if (!this._active) {
+        return;
+      }
+
       if (this.options.job) {
         this.options.job();
       } else {
